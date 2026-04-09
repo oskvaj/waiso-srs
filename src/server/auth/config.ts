@@ -3,6 +3,8 @@ import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 
 import { db } from "@/server/db";
+import Nodemailer from "next-auth/providers/nodemailer";
+import { env } from "@/env";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -32,7 +34,17 @@ declare module "next-auth" {
  */
 export const authConfig = {
   providers: [
-    DiscordProvider,
+    Nodemailer({
+      server: {
+        host: env.EMAIL_SERVER_HOST,
+        port: Number(env.EMAIL_SERVER_PORT),
+        auth: {
+          user: env.EMAIL_SERVER_USER,
+          pass: env.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: env.EMAIL_FROM,
+    }),
     /**
      * ...add more providers here.
      *
