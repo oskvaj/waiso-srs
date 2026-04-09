@@ -15,16 +15,36 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
+model Teacher {
+    userId  String   @id
+    user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    courses Course[]
+}
+
+model Student {
+    userId String @id
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Course {
+    id        String   @id @default(cuid())
     name      String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+    owner     String
+    teacher   Teacher  @relation(fields: [owner], references: [userId]) //If indtended behaviour is delete courses when teacher is deleted, add ", onDelete: Cascade"
+    modules   Module[]
+}
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+model Module {
+    id            String   @id @default(cuid())
+    name          String
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+    prerequisites Module[] @relation("ModulePrerequisite")
+    requiredFor   Module[] @relation("ModulePrerequisite")
+    courseId      String
+    course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 }
 
 // Necessary for Next auth
@@ -60,10 +80,12 @@ model User {
     name          String?
     email         String?   @unique
     emailVerified DateTime?
+    createdAt     DateTime  @default(now())
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
+    teacher       Teacher?
+    student       Student?
 }
 
 model VerificationToken {
