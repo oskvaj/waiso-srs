@@ -16,35 +16,97 @@ datasource db {
 }
 
 model Teacher {
-    userId  String   @id
-    user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId String @id
+    user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    //Courses they have created
     courses Course[]
 }
 
 model Student {
     userId String @id
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    //Courses they attend
+    inCourses        StudentInCourse[]
+    moduleProgresses ModuleProgress[]
 }
 
 model Course {
-    id        String   @id @default(cuid())
-    name      String
+    id   String @id @default(cuid())
+    name String
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
-    owner     String
-    teacher   Teacher  @relation(fields: [owner], references: [userId]) //If indtended behaviour is delete courses when teacher is deleted, add ", onDelete: Cascade"
-    modules   Module[]
+
+    owner   String
+    teacher Teacher @relation(fields: [owner], references: [userId]) //If indtended behaviour is delete courses when teacher is deleted, add ", onDelete: Cascade"
+
+    //Modules that are part of the course
+    modules          Module[]
+    //Students that are in the course
+    studentInCourses StudentInCourse[]
+    moduleProgresses ModuleProgress[]
 }
 
 model Module {
-    id            String   @id @default(cuid())
-    name          String
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    id      String @id @default(cuid())
+    name    String
+    content Json
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
     prerequisites Module[] @relation("ModulePrerequisite")
     requiredFor   Module[] @relation("ModulePrerequisite")
-    courseId      String
-    course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    courseId String
+    course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    //What questions belong to this module
+    questions        Question[]
+    moduleProgresses ModuleProgress[]
+}
+
+model Question {
+    id      String @id @default(cuid())
+    name    String
+    content Json
+
+    correctlyAnswerd Int @default(0) //Times a student got question correct
+    totalAnswers     Int @default(0) //Times a student has answered the question
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    moduleId String
+    module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+}
+
+model StudentInCourse {
+    studentId String
+    courseId  String
+
+    student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+    course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+    @@id([studentId, courseId])
+}
+
+model ModuleProgress {
+    studentId  String
+    courseId   String
+    moduleId   String
+    level      Int       @default(0)
+    nextReview DateTime? //Next FULL HOUR when a review is scheduled, NULL if user has review active but has not done it
+
+    student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+    course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    module  Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+    @@id([studentId, courseId, moduleId])
+    @@index([nextReview])
+    @@index([studentId, nextReview])
 }
 
 // Necessary for Next auth
