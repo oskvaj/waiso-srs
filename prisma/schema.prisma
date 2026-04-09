@@ -39,14 +39,17 @@ model Course {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    owner   String
-    teacher Teacher @relation(fields: [owner], references: [userId]) //If indtended behaviour is delete courses when teacher is deleted, add ", onDelete: Cascade"
+    teacherId String
+
+    teacher Teacher @relation(fields: [teacherId], references: [userId]) //If indtended behaviour is delete courses when teacher is deleted, add ", onDelete: Cascade"
 
     //Modules that are part of the course
     modules          Module[]
     //Students that are in the course
     studentInCourses StudentInCourse[]
     moduleProgresses ModuleProgress[]
+
+    @@index([teacherId])
 }
 
 model Module {
@@ -66,6 +69,8 @@ model Module {
     //What questions belong to this module
     questions        Question[]
     moduleProgresses ModuleProgress[]
+
+    @@index([courseId])
 }
 
 model Question {
@@ -73,24 +78,30 @@ model Question {
     name    String
     content Json
 
-    correctlyAnswerd Int @default(0) //Times a student got question correct
-    totalAnswers     Int @default(0) //Times a student has answered the question
+    correctAnswers Int @default(0) //Times a student got question correct
+    totalAnswers   Int @default(0) //Times a student has answered the question
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     moduleId String
-    module   Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+    module Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+    @@index([moduleId])
 }
 
 model StudentInCourse {
     studentId String
     courseId  String
 
+    createdAt DateTime @default(now())
+
     student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
     course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
     @@id([studentId, courseId])
+    @@index([courseId])
 }
 
 model ModuleProgress {
