@@ -1,6 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+  --font-theme-heading: var(--font-heading);
+  --font-theme-body: var(--font-body);
+
+  --color-theme-text: var(--color-text);
+  --color-theme-muted: var(--color-muted);
+  --color-theme-disabled: var(--color-disabled);
+  --color-theme-inverse: var(--color-inverse);
+  --color-theme-page: var(--color-page);
+  --color-theme-card: var(--color-card);
+  --color-theme-raised: var(--color-raised);
+  --color-theme-border: var(--color-border);
+  --color-theme-shadow: var(--color-shadow);
+  --color-theme-primary: var(--color-primary);
+  --color-theme-subtle: var(--color-subtle);
+  --color-theme-action: var(--color-action);
+  --color-theme-success: var(--color-success);
+  --color-theme-danger: var(--color-danger);
 }
