@@ -28,8 +28,7 @@ model Student {
     user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     //Courses they attend
-    inCourses        StudentInCourse[]
-    moduleProgresses ModuleProgress[]
+    inCourses StudentInCourse[]
 }
 
 model Course {
@@ -47,7 +46,6 @@ model Course {
     modules          Module[]
     //Students that are in the course
     studentInCourses StudentInCourse[]
-    moduleProgresses ModuleProgress[]
 
     @@index([teacherId])
 }
@@ -100,6 +98,8 @@ model StudentInCourse {
     student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
     course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
+    ModuleProgress ModuleProgress[]
+
     @@id([studentId, courseId])
     @@index([courseId])
 }
@@ -111,9 +111,8 @@ model ModuleProgress {
     level      Int       @default(0)
     nextReview DateTime? //Next FULL HOUR when a review is scheduled, NULL if user has review active but has not done it
 
-    student Student @relation(fields: [studentId], references: [userId], onDelete: Cascade)
-    course  Course  @relation(fields: [courseId], references: [id], onDelete: Cascade)
-    module  Module  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+    enrollment StudentInCourse @relation(fields: [studentId, courseId], references: [studentId, courseId])
+    module     Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
     @@id([studentId, courseId, moduleId])
     @@index([nextReview])
