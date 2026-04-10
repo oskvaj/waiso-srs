@@ -20,6 +20,7 @@ async function main() {
 
   const user1 = await prisma.user.create({
     data: {
+      id: "cmnso327o00008394bg3lnrfq",
       name: "tea cher",
       email: "teacheremail@gmail.com",
     },
@@ -27,6 +28,7 @@ async function main() {
 
   const user2 = await prisma.user.create({
     data: {
+      id: "cmnso327v00018394aqpjylpz",
       name: "stu dent",
       email: "studnetemail@gmail.com",
     },
