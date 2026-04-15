@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
 type CourseCardProps = {
@@ -51,10 +52,12 @@ export function CourseCard({
             {modulesCount} modules • {questionsCount} questions
           </p>
 
+          <Separator className="my-4" />
+
           {studentsCount > 0 ? (
             <p className="text-theme-muted mt-4 text-sm">
-              {studentsCount} students • {Math.round(avgProgress * 100)}% avg
-              progress • {Math.round(avgMastery * 100)}% avg mastery
+              {studentsCount} students • {Math.round(avgProgress * 100)}%
+              progress • {Math.round(avgMastery * 100)}% mastery
             </p>
           ) : (
             <p className="text-theme-muted mt-4 text-sm">0 students</p>
