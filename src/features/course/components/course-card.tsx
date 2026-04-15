@@ -33,7 +33,7 @@ export function CourseCard({
     <Link href={`/courses/${id}`}>
       <Card
         variant="raised"
-        className="hover:border-theme-primary/40 group h-full p-6 transition-colors"
+        className="hover:bg-theme-primary/5 group h-full p-6 transition-colors"
       >
         <CardHeader className="flex flex-row items-center justify-between">
           <div
