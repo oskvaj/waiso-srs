@@ -4,7 +4,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme {
+@theme inline {
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
@@ -12,67 +12,56 @@
   --font-theme-heading: var(--font-heading);
   --font-theme-body: var(--font-body);
 
-  --color-theme-text: var(--color-text);
-  --color-theme-muted: var(--color-muted);
-  --color-theme-disabled: var(--color-disabled);
-  --color-theme-inverse: var(--color-inverse);
-  --color-theme-page: var(--color-page);
-  --color-theme-card: var(--color-card);
-  --color-theme-raised: var(--color-raised);
-  --color-theme-border: var(--color-border);
-  --color-theme-shadow: var(--color-shadow);
-  --color-theme-primary: var(--color-primary);
-  --color-theme-subtle: var(--color-subtle);
-  --color-theme-action: var(--color-action);
-  --color-theme-success: var(--color-success);
-  --color-theme-danger: var(--color-danger);
-}
+  /* App theme tokens */
+  --color-theme-text: var(--app-text);
+  --color-theme-muted: var(--app-muted);
+  --color-theme-disabled: var(--app-disabled);
+  --color-theme-inverse: var(--app-inverse);
+  --color-theme-page: var(--app-page);
+  --color-theme-card: var(--app-card);
+  --color-theme-raised: var(--app-raised);
+  --color-theme-border: var(--app-border);
+  --color-theme-shadow: var(--app-shadow);
+  --color-theme-primary: var(--app-primary);
+  --color-theme-subtle: var(--app-subtle);
+  --color-theme-action: var(--app-action);
+  --color-theme-success: var(--app-success);
+  --color-theme-danger: var(--app-danger);
 
-@theme inline {
-  --font-heading: var(--font-heading);
+  /* shadcn tokens → app tokens */
+  --color-background: var(--app-page);
+  --color-foreground: var(--app-text);
+  --color-card: var(--app-card);
+  --color-card-foreground: var(--app-text);
+  --color-popover: var(--app-raised);
+  --color-popover-foreground: var(--app-text);
+  --color-primary: var(--app-primary);
+  --color-primary-foreground: var(--app-inverse);
+  --color-secondary: var(--app-subtle);
+  --color-secondary-foreground: var(--app-text);
+  --color-muted: var(--app-subtle);
+  --color-muted-foreground: var(--app-muted);
+  --color-accent: var(--app-action);
+  --color-accent-foreground: var(--app-inverse);
+  --color-destructive: var(--app-danger);
+  --color-border: var(--app-border);
+  --color-input: var(--app-border);
+  --color-ring: var(--app-primary);
 
-  /* shadcn tokens → honeybee tokens */
-  --color-background: var(--color-page);
-  --color-foreground: var(--color-text);
+  --color-chart-1: var(--app-primary);
+  --color-chart-2: var(--app-action);
+  --color-chart-3: var(--app-success);
+  --color-chart-4: var(--app-danger);
+  --color-chart-5: var(--app-muted);
 
-  --color-card: var(--color-card);
-  --color-card-foreground: var(--color-text);
-
-  --color-popover: var(--color-raised);
-  --color-popover-foreground: var(--color-text);
-
-  --color-primary: var(--color-primary);
-  --color-primary-foreground: var(--color-inverse);
-
-  --color-secondary: var(--color-subtle);
-  --color-secondary-foreground: var(--color-text);
-
-  --color-muted: var(--color-subtle);
-  --color-muted-foreground: var(--color-muted);
-
-  --color-accent: var(--color-action);
-  --color-accent-foreground: var(--color-inverse);
-
-  --color-destructive: var(--color-danger);
-
-  --color-border: var(--color-border);
-  --color-input: var(--color-border);
-  --color-ring: var(--color-primary);
-
-  --color-chart-1: var(--color-primary);
-  --color-chart-2: var(--color-action);
-  --color-chart-3: var(--color-success);
-  --color-chart-4: var(--color-danger);
-  --color-chart-5: var(--color-muted);
-
-  --color-sidebar: var(--color-card);
-  --color-sidebar-foreground: var(--color-text);
-  --color-sidebar-primary: var(--color-primary);
-  --color-sidebar-primary-foreground: var(--color-inverse);
-  --color-sidebar-accent: var(--color-subtle);
-  --color-sidebar-accent-foreground: var(--color-text);
-  --color-sidebar-border: var(--color-border);
-  --color-sidebar-ring: var(--color-primary);
+  --color-sidebar: var(--app-card);
+  --color-sidebar-foreground: var(--app-text);
+  --color-sidebar-primary: var(--app-primary);
+  --color-sidebar-primary-foreground: var(--app-inverse);
+  --color-sidebar-accent: var(--app-subtle);
+  --color-sidebar-accent-foreground: var(--app-text);
+  --color-sidebar-border: var(--app-border);
+  --color-sidebar-ring: var(--app-primary);
 
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
