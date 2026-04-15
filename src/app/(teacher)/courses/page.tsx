@@ -1,17 +1,19 @@
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseGrid } from "@/features/course/components/course-grid";
+import { api } from "@/trpc/server";
 
-export default function CoursesPage() {
+export default async function CoursesPage() {
+  const courses = await api.course.listMine();
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="font-theme-heading text-3xl font-bold">My courses</h1>
 
-          {/* TODO: placeholder */}
           <p className="text-theme-muted mt-1 text-sm">
-            0 courses • 0 students
+            {courses.length} courses
           </p>
         </div>
 
@@ -21,7 +23,7 @@ export default function CoursesPage() {
         </Button>
       </div>
 
-      <CourseGrid />
+      <CourseGrid courses={courses} />
     </div>
   );
 }
