@@ -50,6 +50,7 @@ async function main() {
     data: {
       name: "Course name",
       teacherId: teacher.userId,
+      published: true,
     },
   });
 
