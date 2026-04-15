@@ -4,6 +4,10 @@ import { type Metadata } from "next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { fonts, getThemeVars, type ThemeMode, type ThemeName } from "./theme";
+import { Geist } from "next/font/google";
+import { cn } from "@/lib/utils";
+
+const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
 const THEME: ThemeName = "honeybee";
 const MODE: ThemeMode = "light";
@@ -20,7 +24,7 @@ export default function RootLayout({
   const themeVars = getThemeVars(THEME, MODE);
 
   return (
-    <html lang="en" className={`${fonts.classes}`}>
+    <html lang="en" className={cn(fonts.classes, "font-sans", geist.variable)}>
       <body
         className="font-theme-body bg-theme-page text-theme-text antialiased"
         style={themeVars as React.CSSProperties}
