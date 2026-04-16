@@ -25,7 +25,7 @@ export default async function Home() {
                 href={
                   session
                     ? env.NODE_ENV === "development"
-                      ? "/api//dev-logout"
+                      ? "/api/dev-logout"
                       : "/api/auth/signout"
                     : env.NODE_ENV === "development"
                       ? "/dev-login"
