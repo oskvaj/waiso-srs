@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@/../generated/prisma";
 import { MAX_LEVEL, PASSED_LEVEL } from "@/lib/constants";
+import z from "zod";
 
 export type CourseListItem = {
   id: string;
@@ -93,5 +94,35 @@ export async function listCoursesForTeacher(
       avgProgress: progressSum / studentsCount,
       avgMastery: masterySum / studentsCount,
     };
+  });
+}
+
+export const createCourseSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name is too long"),
+  description: z
+    .string()
+    .trim()
+    .max(2000, "Description is too long")
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
+});
+export type CreateCourseInput = z.infer<typeof createCourseSchema>;
+
+export async function createCourse(
+  db: PrismaClient,
+  teacherId: string,
+  input: CreateCourseInput,
+): Promise<{ id: string }> {
+  return db.course.create({
+    data: {
+      name: input.name,
+      description: input.description,
+      teacherId,
+    },
+    select: { id: true },
   });
 }
