@@ -47,7 +47,9 @@ export function CourseCard({
         </CardHeader>
 
         <CardContent>
-          <CardTitle className="font-theme-heading text-lg">{name}</CardTitle>
+          <CardTitle className="font-theme-heading truncate text-lg">
+            {name}
+          </CardTitle>
           <p className="text-theme-muted mt-1 text-sm">
             {modulesCount} modules • {questionsCount} questions
           </p>
