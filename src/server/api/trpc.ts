@@ -131,3 +131,25 @@ export const protectedProcedure = t.procedure
       },
     });
   });
+
+/**
+ * Teacher procedure
+ *
+ * Extends protectedProcedure to verify the user is a teacher
+ * Adds ctx.teacher for downstream handlers
+ */
+export const teacherProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const teacher = await ctx.db.teacher.findUnique({
+      where: { userId: ctx.session.user.id },
+    });
+    if (!teacher) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Not a teacher" });
+    }
+    return next({
+      ctx: {
+        teacher,
+      },
+    });
+  },
+);
