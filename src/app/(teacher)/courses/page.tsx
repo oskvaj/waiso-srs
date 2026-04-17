@@ -2,6 +2,7 @@ import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CourseGrid } from "@/features/course/components/course-grid";
 import { api } from "@/trpc/server";
+import { NewCourseDialog } from "@/features/course/components/new-course-dialog";
 
 export default async function CoursesPage() {
   const courses = await api.course.listMine();
@@ -17,10 +18,12 @@ export default async function CoursesPage() {
           </p>
         </div>
 
-        <Button variant="action" className="px-5 py-3">
-          <Plus />
-          New course
-        </Button>
+        <NewCourseDialog>
+          <Button variant="action" className="px-5 py-3">
+            <Plus />
+            New course
+          </Button>
+        </NewCourseDialog>
       </div>
 
       <CourseGrid courses={courses} />
