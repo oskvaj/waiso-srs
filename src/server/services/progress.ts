@@ -47,7 +47,7 @@ export function calculateAvgCourseProgress(
   let masterySum = 0;
 
   for (const { passed, levelSum } of progressByStudent.values()) {
-    progressSum += passed / studentsCount;
+    progressSum += passed / moudlesCount;
     masterySum += levelSum / (moudlesCount * MAX_LEVEL);
   }
 
@@ -71,6 +71,6 @@ export function calculateAvgModuleProgress(
 
   return {
     avgProgress: passed / enrolledCount,
-    avgMastery: levelSum / enrolledCount,
+    avgMastery: levelSum / (enrolledCount * MAX_LEVEL),
   };
 }
