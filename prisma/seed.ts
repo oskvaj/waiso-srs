@@ -18,176 +18,113 @@ async function clearDatabase() {
 async function main() {
   await clearDatabase();
 
-  const user1 = await prisma.user.create({
-    data: {
-      id: "cmnso327o00008394bg3lnrfq",
-      name: "tea cher",
-      email: "teacheremail@gmail.com",
-    },
+  const teacher = await prisma.user.create({
+    data: { id: "teacher-1", name: "Dr. Anderson", email: "anderson@uni.edu" },
   });
+  await prisma.teacher.create({ data: { userId: teacher.id } });
 
-  const user2 = await prisma.user.create({
-    data: {
-      id: "cmnso327v00018394aqpjylpz",
-      name: "stu dent",
-      email: "studnetemail@gmail.com",
-    },
-  });
+  const studentNames = [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "Diana",
+    "Erik",
+    "Fatima",
+    "Gustav",
+    "Hannah",
+    "Ivan",
+    "Julia",
+  ];
+  const students = [];
+  for (let i = 0; i < studentNames.length; i++) {
+    const user = await prisma.user.create({
+      data: {
+        id: `student-${i}`,
+        name: studentNames[i]!,
+        email: `${studentNames[i]!.toLowerCase()}@student.edu`,
+      },
+    });
+    await prisma.student.create({ data: { userId: user.id } });
+    students.push(user);
+  }
 
-  const teacher = await prisma.teacher.create({
-    data: {
-      userId: user1.id,
-    },
-  });
-
-  const student = await prisma.student.create({
-    data: {
-      userId: user2.id,
-    },
-  });
-
-  const course = await prisma.course.create({
-    data: {
-      name: "Course name",
-      teacherId: teacher.userId,
+  const courses = [
+    {
+      name: "Basic computer technology",
       published: true,
+      modules: 24,
+      enrollStudents: 10,
     },
-  });
+    {
+      name: "Electrical circuits",
+      published: true,
+      modules: 18,
+      enrollStudents: 8,
+    },
+    { name: "Programming", published: true, modules: 20, enrollStudents: 6 },
+    {
+      name: "Data structures",
+      published: false,
+      modules: 8,
+      enrollStudents: 0,
+    },
+  ];
 
-  const module1 = await prisma.module.create({
-    data: {
-      name: "module 1",
-      courseId: course.id,
-      content: {
-        theory: "A very cool fact!",
+  for (const def of courses) {
+    const course = await prisma.course.create({
+      data: {
+        name: def.name,
+        published: def.published,
+        teacherId: teacher.id,
       },
-    },
-  });
+    });
 
-  const module2 = await prisma.module.create({
-    data: {
-      name: "module 2",
-      courseId: course.id,
-      content: {
-        theory: "Another very cool fact",
-      },
-    },
-  });
+    const modules = [];
+    for (let i = 0; i < def.modules; i++) {
+      const mod = await prisma.module.create({
+        data: {
+          name: `Module ${i + 1}`,
+          courseId: course.id,
+          content: { theory: `Theory for module ${i + 1}.` },
+        },
+      });
+      for (let q = 0; q < 3; q++) {
+        await prisma.question.create({
+          data: {
+            name: `M${i + 1} Q${q + 1}`,
+            moduleId: mod.id,
+            content: {
+              question: `Question ${q + 1} about module ${i + 1}?`,
+              answers: ["A", "B", "C", "D"],
+              correctAnswer: 0,
+            },
+          },
+        });
+      }
+      modules.push(mod);
+    }
 
-  const module3 = await prisma.module.create({
-    data: {
-      name: "module 3",
-      courseId: course.id,
-      prerequisites: {
-        connect: [{ id: module2.id }],
-      },
-      content: {
-        theory: "A THIRD very cool fact!?!?!?!?",
-      },
-    },
-  });
+    for (let si = 0; si < def.enrollStudents; si++) {
+      const student = students[si]!;
+      await prisma.studentInCourse.create({
+        data: { studentId: student.id, courseId: course.id },
+      });
 
-  const module4 = await prisma.module.create({
-    data: {
-      name: "module 4",
-      courseId: course.id,
-      prerequisites: {
-        connect: [{ id: module1.id }, { id: module2.id }],
-      },
-      content: {
-        theory: "Ain't no way there are FOUR cool facts??",
-      },
-    },
-  });
+      const modulesWithProgress = Math.min((si + 1) * 2, modules.length);
+      for (let mi = 0; mi < modulesWithProgress; mi++) {
+        await prisma.moduleProgress.create({
+          data: {
+            studentId: student.id,
+            courseId: course.id,
+            moduleId: modules[mi]!.id,
+            level: mi < modulesWithProgress / 2 ? 8 : 3,
+          },
+        });
+      }
+    }
+  }
 
-  const question1 = await prisma.question.create({
-    data: {
-      name: "question 1",
-      content: {
-        questions: ["a + b", "c + d"],
-        answers: ["a + b", "c + d"],
-      },
-      moduleId: module1.id,
-    },
-  });
-
-  const question2 = await prisma.question.create({
-    data: {
-      name: "question 2",
-      content: {
-        questions: ["p + q", "p + q"],
-        answers: ["p + q", "p + q"],
-      },
-      moduleId: module2.id,
-    },
-  });
-
-  const question3 = await prisma.question.create({
-    data: {
-      name: "question 3",
-      content: {
-        questions: ["u + v", "u + v"],
-        answers: ["u + v", "u + v"],
-      },
-      moduleId: module3.id,
-    },
-  });
-
-  const question4 = await prisma.question.create({
-    data: {
-      name: "question4",
-      content: {
-        questions: ["x + y", "x + y"],
-        answers: ["x + y", "x + y"],
-      },
-      moduleId: module4.id,
-    },
-  });
-
-  const studentInCourse = await prisma.studentInCourse.create({
-    data: {
-      studentId: student.userId,
-      courseId: course.id,
-    },
-  });
-
-  const moduleProgress1 = await prisma.moduleProgress.create({
-    data: {
-      studentId: student.userId,
-      courseId: course.id,
-      moduleId: module1.id,
-      level: 1,
-    },
-  });
-
-  const moduleProgress2 = await prisma.moduleProgress.create({
-    data: {
-      studentId: student.userId,
-      courseId: course.id,
-      moduleId: module2.id,
-      level: 2,
-    },
-  });
-
-  const moduleProgress3 = await prisma.moduleProgress.create({
-    data: {
-      studentId: student.userId,
-      courseId: course.id,
-      moduleId: module3.id,
-      level: 3,
-    },
-  });
-
-  const moduleProgress4 = await prisma.moduleProgress.create({
-    data: {
-      studentId: student.userId,
-      courseId: course.id,
-      moduleId: module4.id,
-      level: 4,
-    },
-  });
-
-  console.log("Finished seeding database to bare minimum!");
+  console.log("Seeding complete!");
 }
 
 main()
