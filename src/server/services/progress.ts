@@ -13,7 +13,7 @@ export type ProgressStats = {
   avgMastery: number;
 };
 
-export function calculateCourseProgress(
+export function calculateAvgCourseProgress(
   modules: ModuleWithProgress[],
   students: EnrolledStudent[],
 ): ProgressStats {
@@ -57,7 +57,7 @@ export function calculateCourseProgress(
   };
 }
 
-export function calculateModuleProgress(
+export function calculateAvgModuleProgress(
   moduleProgresses: { studentId: string; level: number }[],
   enrolledCount: number,
 ): ProgressStats {
