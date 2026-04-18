@@ -56,3 +56,21 @@ export function calculateCourseProgress(
     avgMastery: masterySum / studentsCount,
   };
 }
+
+export function calculateModuleProgress(
+  moduleProgresses: { studentId: string; level: number }[],
+  enrolledCount: number,
+): ProgressStats {
+  if (enrolledCount === 0) {
+    return { avgProgress: 0, avgMastery: 0 };
+  }
+
+  const passed = moduleProgresses.filter((p) => p.level >= PASSED_LEVEL).length;
+
+  const levelSum = moduleProgresses.reduce((sum, p) => sum + p.level, 0);
+
+  return {
+    avgProgress: passed / enrolledCount,
+    avgMastery: levelSum / enrolledCount,
+  };
+}
