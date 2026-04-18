@@ -11,7 +11,10 @@ export function ModuleCard({
 }) {
   return (
     <Link href={`/courses/${courseId}/modules/${module.id}`}>
-      <Card className="hover:border-theme-primary/40 h-full min-w-40 transition-colors">
+      <Card
+        variant="raised"
+        className="hover:bg-theme-primary/5 h-full min-w-40 transition-colors"
+      >
         <CardHeader>
           <CardTitle className="font-theme-heading truncate text-sm">
             {module.name}
@@ -39,7 +42,7 @@ function ProgressBar({ value, color }: { value: number; color: string }) {
       <div className="bg-theme-border h-1.5 flex-1 rounded-full">
         <div
           className={`${color} h-full rounded-full transition-all`}
-          style={{ width: `${percent}` }}
+          style={{ width: `${percent}%` }}
         />
       </div>
       <span className="text-theme-muted w-8 text-right text-xs">
