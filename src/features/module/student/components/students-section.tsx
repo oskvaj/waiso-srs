@@ -27,7 +27,7 @@ export function StudentsSection({ students }: { students: StudentListItem[] }) {
       setSortDir(sortDir === "asc" ? "desc" : "asc");
     } else {
       setSortKey(key);
-      setSortDir("asc");
+      setSortDir(key === "name" ? "asc" : "desc");
     }
   }
 
@@ -125,6 +125,20 @@ function SortableHead({
 }) {
   const isActive = currentKey === sortKey;
 
+  function sortArrow(key: SortKey, dir: SortDir) {
+    if (key === "name") {
+      return dir === "asc" ? (
+        <ChevronDown className="size-3.5" />
+      ) : (
+        <ChevronUp className="size-3.5" />
+      );
+    }
+    return dir === "desc" ? (
+      <ChevronDown className="size-3.5" />
+    ) : (
+      <ChevronUp className="size-3.5" />
+    );
+  }
   return (
     <TableHead>
       <button
@@ -134,11 +148,7 @@ function SortableHead({
       >
         {label}
         {isActive ? (
-          currentDir === "asc" ? (
-            <ChevronUp className="size-3.5" />
-          ) : (
-            <ChevronDown className="size-3.5" />
-          )
+          sortArrow(sortKey, currentDir)
         ) : (
           <ArrowUpDown className="text-theme-muted size-3.5" />
         )}
