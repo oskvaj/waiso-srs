@@ -1,6 +1,7 @@
 import type { CourseOverview } from "@/server/services/course";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { DescriptionBlock } from "./description-block";
 
 export function CourseHeader({ course }: { course: CourseOverview }) {
   return (
@@ -28,6 +29,9 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
               </>
             )}
           </p>
+          {course.description && (
+            <DescriptionBlock description={course.description} />
+          )}
         </div>
 
         {!course.published && (
