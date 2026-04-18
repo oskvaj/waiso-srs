@@ -29,13 +29,21 @@ export function ModulesSection({
         <h2 className="font-theme-heading text-xl font-semibold">
           Modules ({modules.length})
         </h2>
-        <Button
-          variant="default"
-          className="hover:bg-theme-primary/80 items-center hover:cursor-pointer"
-        >
-          <Plus className="size-3" />
-          Add module
-        </Button>
+        <div className="space-x-4">
+          <Button
+            variant="default"
+            className="hover:bg-theme-primary/80 items-center hover:cursor-pointer"
+          >
+            Dependency graph
+          </Button>
+          <Button
+            variant="action"
+            className="hover:bg-theme-action/80 items-center hover:cursor-pointer"
+          >
+            <Plus className="size-3" />
+            Add module
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
