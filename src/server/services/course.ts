@@ -1,6 +1,7 @@
 import type { PrismaClient } from "@/../generated/prisma";
-import { MAX_LEVEL, PASSED_LEVEL } from "@/lib/constants";
+import { TRPCError } from "@trpc/server";
 import z from "zod";
+import { calculateProgressStats } from "./progress";
 
 export type CourseListItem = {
   id: string;
@@ -42,47 +43,10 @@ export async function listCoursesForTeacher(
 
     const studentsCount = course.studentInCourses.length;
 
-    if (studentsCount === 0 || modulesCount === 0) {
-      return {
-        id: course.id,
-        name: course.name,
-        published: course.published,
-        modulesCount,
-        questionsCount,
-        studentsCount,
-        avgProgress: 0,
-        avgMastery: 0,
-      };
-    }
-
-    const progressByStudent = new Map<
-      string,
-      { passed: number; levelSum: number }
-    >();
-
-    for (const student of course.studentInCourses) {
-      progressByStudent.set(student.studentId, { passed: 0, levelSum: 0 });
-    }
-
-    for (const mod of course.modules) {
-      for (const moduleProgress of mod.moduleProgresses) {
-        const entry = progressByStudent.get(moduleProgress.studentId);
-
-        if (!entry) continue;
-
-        if (moduleProgress.level >= PASSED_LEVEL) entry.passed += 1;
-
-        entry.levelSum += moduleProgress.level;
-      }
-    }
-
-    let progressSum = 0;
-    let masterySum = 0;
-
-    for (const { passed, levelSum } of progressByStudent.values()) {
-      progressSum += passed / modulesCount;
-      masterySum += levelSum / (modulesCount * MAX_LEVEL);
-    }
+    const stats = calculateProgressStats(
+      course.modules,
+      course.studentInCourses,
+    );
 
     return {
       id: course.id,
@@ -91,8 +55,7 @@ export async function listCoursesForTeacher(
       modulesCount,
       questionsCount,
       studentsCount,
-      avgProgress: progressSum / studentsCount,
-      avgMastery: masterySum / studentsCount,
+      ...stats,
     };
   });
 }
@@ -125,4 +88,68 @@ export async function createCourse(
     },
     select: { id: true },
   });
+}
+
+export type CourseOverview = {
+  id: string;
+  name: string;
+  description: string | null;
+  published: boolean;
+  modulesCount: number;
+  questionsCount: number;
+  studentsCount: number;
+  avgProgress: number;
+  avgMastery: number;
+};
+
+export async function getCourseOverview(
+  db: PrismaClient,
+  courseId: string,
+  teacherId: string,
+): Promise<CourseOverview> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    include: {
+      modules: {
+        select: {
+          id: true,
+          _count: { select: { questions: true } },
+          moduleProgresses: {
+            select: { studentId: true, level: true },
+          },
+        },
+      },
+      studentInCourses: { select: { studentId: true } },
+    },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+
+  const modulesCount = course.modules.length;
+
+  const questionsCount = course.modules.reduce(
+    (sum, mod) => sum + mod._count.questions,
+    0,
+  );
+
+  const studentsCount = course.studentInCourses.length;
+
+  const stats = calculateProgressStats(course.modules, course.studentInCourses);
+
+  return {
+    id: course.id,
+    name: course.name,
+    description: course.description,
+    published: course.published,
+    modulesCount,
+    questionsCount,
+    studentsCount,
+    ...stats,
+  };
 }
