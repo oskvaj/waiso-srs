@@ -1,5 +1,6 @@
 import { CourseHeader } from "@/features/course/components/course-header";
 import { ModulesSection } from "@/features/module/components/modules-section";
+import { StudentsSection } from "@/features/module/student/components/students-section";
 import { api } from "@/trpc/server";
 import { notFound } from "next/navigation";
 
@@ -18,13 +19,13 @@ export default async function CourseOverviewPage({
   }
 
   const modules = await api.module.listForTeacher({ courseId: id });
+  const students = await api.student.listByCourse({ courseId: id });
 
   return (
     <div className="space-y-8">
       <CourseHeader course={course} />
       <ModulesSection modules={modules} courseId={id} />
-
-      <div className="text-theme-muted">Students table placeholder</div>
+      <StudentsSection students={students} />
     </div>
   );
 }
