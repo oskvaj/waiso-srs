@@ -1,7 +1,7 @@
 import type { PrismaClient } from "@/../generated/prisma";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
-import { calculateProgressStats } from "./progress";
+import { calculateCourseProgress } from "./progress";
 
 export type CourseListItem = {
   id: string;
@@ -43,7 +43,7 @@ export async function listCoursesForTeacher(
 
     const studentsCount = course.studentInCourses.length;
 
-    const stats = calculateProgressStats(
+    const progress = calculateCourseProgress(
       course.modules,
       course.studentInCourses,
     );
@@ -55,7 +55,7 @@ export async function listCoursesForTeacher(
       modulesCount,
       questionsCount,
       studentsCount,
-      ...stats,
+      ...progress,
     };
   });
 }
@@ -140,7 +140,10 @@ export async function getCourseOverview(
 
   const studentsCount = course.studentInCourses.length;
 
-  const stats = calculateProgressStats(course.modules, course.studentInCourses);
+  const progress = calculateCourseProgress(
+    course.modules,
+    course.studentInCourses,
+  );
 
   return {
     id: course.id,
@@ -150,6 +153,6 @@ export async function getCourseOverview(
     modulesCount,
     questionsCount,
     studentsCount,
-    ...stats,
+    ...progress,
   };
 }
