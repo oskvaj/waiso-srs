@@ -1,6 +1,6 @@
 import type { PrismaClient } from "@/../generated/prisma";
-import { TRPCError } from "@trpc/server";
 import { calculateAvgModuleProgress } from "./progress";
+import { assertCourseOwnership } from "./course";
 
 export type ModuleListItem = {
   id: string;
@@ -15,18 +15,7 @@ export async function listModulesForTeacher(
   courseId: string,
   teacherId: string,
 ): Promise<ModuleListItem[]> {
-  const course = await db.course.findUnique({
-    where: { id: courseId },
-    select: { teacherId: true },
-  });
-
-  if (!course) {
-    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
-  }
-
-  if (course.teacherId !== teacherId) {
-    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
-  }
+  await assertCourseOwnership(db, courseId, teacherId);
 
   const enrolledCount = await db.studentInCourse.count({
     where: { courseId },

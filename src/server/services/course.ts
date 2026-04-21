@@ -156,3 +156,22 @@ export async function getCourseOverview(
     ...progress,
   };
 }
+
+export async function assertCourseOwnership(
+  db: PrismaClient,
+  courseId: string,
+  teacherId: string,
+): Promise<void> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: { teacherId: true },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+}
