@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import { ModuleCard } from "./module-card";
 import { useState } from "react";
 import { AddModuleCard } from "./add-module-card";
+import { AddModuleDialog } from "./add-module-dialog";
 
 const VISIBLE_COUNT = 12;
 
@@ -36,18 +37,20 @@ export function ModulesSection({
           >
             Dependency graph
           </Button>
-          <Button
-            variant="action"
-            className="hover:bg-theme-action/80 items-center hover:cursor-pointer"
-          >
-            <Plus className="size-3" />
-            Add module
-          </Button>
+          <AddModuleDialog courseId={courseId}>
+            <Button
+              variant="action"
+              className="hover:bg-theme-action/80 items-center hover:cursor-pointer"
+            >
+              <Plus className="size-3" />
+              Add module
+            </Button>
+          </AddModuleDialog>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        <AddModuleCard />
+        <AddModuleCard courseId={courseId} />
         {visibleModules.map((m) => (
           <ModuleCard key={m.id} module={m} courseId={courseId} />
         ))}
