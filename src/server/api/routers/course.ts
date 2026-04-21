@@ -3,6 +3,8 @@ import {
   createCourseSchema,
   getCourseOverview,
   listCoursesForTeacher,
+  updateCourse,
+  updateCourseSchema,
 } from "@/server/services/course";
 import { createTRPCRouter, teacherProcedure } from "../trpc";
 import z from "zod";
@@ -22,5 +24,11 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return getCourseOverview(ctx.db, input.id, ctx.teacher.userId);
+    }),
+
+  update: teacherProcedure
+    .input(updateCourseSchema)
+    .mutation(({ ctx, input }) => {
+      return updateCourse(ctx.db, ctx.teacher.userId, input);
     }),
 });

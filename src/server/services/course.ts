@@ -157,6 +157,51 @@ export async function getCourseOverview(
   };
 }
 
+export const updateCourseSchema = z.object({
+  id: z.string(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name is too long")
+    .optional(),
+  description: z
+    .string()
+    .trim()
+    .max(2000, "Description is too long")
+    .optional()
+    .transform((v) => (v === "" ? undefined : v)),
+});
+export type UpdateCourseInput = z.infer<typeof updateCourseSchema>;
+
+export async function updateCourse(
+  db: PrismaClient,
+  teacherId: string,
+  input: UpdateCourseInput,
+): Promise<{ id: string }> {
+  const course = await db.course.findUnique({
+    where: { id: input.id },
+    select: { teacherId: true, published: true },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+
+  return db.course.update({
+    where: { id: input.id },
+    data: {
+      name: input.name,
+      description: input.description,
+    },
+    select: { id: true },
+  });
+}
+
 export async function assertCourseOwnership(
   db: PrismaClient,
   courseId: string,
