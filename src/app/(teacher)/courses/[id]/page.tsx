@@ -11,15 +11,16 @@ export default async function CourseOverviewPage({
 }) {
   const { id } = await params;
 
-  let course;
+  let course, modules, students;
   try {
-    course = await api.course.getOverview({ id });
+    [course, modules, students] = await Promise.all([
+      api.course.getOverview({ id }),
+      api.module.listForTeacher({ courseId: id }),
+      api.student.listByCourse({ courseId: id }),
+    ]);
   } catch {
     notFound();
   }
-
-  const modules = await api.module.listForTeacher({ courseId: id });
-  const students = await api.student.listByCourse({ courseId: id });
 
   return (
     <div className="space-y-8">
