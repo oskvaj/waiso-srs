@@ -1,6 +1,6 @@
 import { CourseHeader } from "@/features/course/components/course-header";
 import { ModulesSection } from "@/features/module/components/modules-section";
-import { StudentsSection } from "@/features/module/student/components/students-section";
+import { StudentsSection } from "@/features/student/components/students-section";
 import { api } from "@/trpc/server";
 import { notFound } from "next/navigation";
 
