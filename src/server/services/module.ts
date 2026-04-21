@@ -1,5 +1,6 @@
 import type { PrismaClient } from "@/../generated/prisma";
 import { calculateAvgModuleProgress } from "./progress";
+import z from "zod";
 import { assertCourseOwnership } from "./course";
 
 export type ModuleListItem = {
@@ -46,5 +47,32 @@ export async function listModulesForTeacher(
       questionsCount: m._count.questions,
       ...progress,
     };
+  });
+}
+
+export const createModuleSchema = z.object({
+  courseId: z.string(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(100, "Name is too long"),
+});
+export type CreateModuleInput = z.infer<typeof createModuleSchema>;
+
+export async function createModule(
+  db: PrismaClient,
+  teacherId: string,
+  input: CreateModuleInput,
+): Promise<{ id: string }> {
+  await assertCourseOwnership(db, input.courseId, teacherId);
+
+  return db.module.create({
+    data: {
+      name: input.name,
+      courseId: input.courseId,
+      content: {},
+    },
+    select: { id: true },
   });
 }
