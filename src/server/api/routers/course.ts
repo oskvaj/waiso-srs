@@ -1,6 +1,7 @@
 import {
   createCourse,
   createCourseSchema,
+  deleteCourse,
   getCourseOverview,
   listCoursesForTeacher,
   updateCourse,
@@ -30,5 +31,11 @@ export const courseRouter = createTRPCRouter({
     .input(updateCourseSchema)
     .mutation(({ ctx, input }) => {
       return updateCourse(ctx.db, ctx.teacher.userId, input);
+    }),
+
+  delete: teacherProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return deleteCourse(ctx.db, input.id, ctx.teacher.userId);
     }),
 });

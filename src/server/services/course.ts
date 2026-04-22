@@ -202,6 +202,37 @@ export async function updateCourse(
   });
 }
 
+export async function deleteCourse(
+  db: PrismaClient,
+  courseId: string,
+  teacherId: string,
+): Promise<{ id: string }> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: {
+      teacherId: true,
+      _count: { select: { studentInCourses: true } },
+    },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+  if (course._count.studentInCourses > 0) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "Cannot delete a course with enrolled students",
+    });
+  }
+
+  await db.course.delete({ where: { id: courseId } });
+
+  return { id: courseId };
+}
+
 export async function assertCourseOwnership(
   db: PrismaClient,
   courseId: string,
