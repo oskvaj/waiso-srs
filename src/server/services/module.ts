@@ -2,6 +2,7 @@ import type { PrismaClient } from "@/../generated/prisma";
 import { calculateAvgModuleProgress } from "./progress";
 import z from "zod";
 import { assertCourseOwnership } from "./course";
+import { TRPCError } from "@trpc/server";
 
 export type ModuleListItem = {
   id: string;
@@ -75,4 +76,43 @@ export async function createModule(
     },
     select: { id: true },
   });
+}
+
+export type ModuleDetail = {
+  id: string;
+  name: string;
+  content: unknown;
+  courseId: string;
+  courseName: string;
+};
+
+export async function getModuleDetail(
+  db: PrismaClient,
+  moduleId: string,
+  teaacherId: string,
+): Promise<ModuleDetail> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: {
+      course: {
+        select: { name: true, teacherId: true },
+      },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+
+  if (mod.course.teacherId !== teaacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+
+  return {
+    id: mod.id,
+    name: mod.name,
+    content: mod.content,
+    courseId: mod.courseId,
+    courseName: mod.course.name,
+  };
 }

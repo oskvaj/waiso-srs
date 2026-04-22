@@ -3,6 +3,7 @@ import { createTRPCRouter, teacherProcedure } from "../trpc";
 import {
   createModule,
   createModuleSchema,
+  getModuleDetail,
   listModulesForTeacher,
 } from "@/server/services/module";
 
@@ -17,5 +18,11 @@ export const moduleRouter = createTRPCRouter({
     .input(createModuleSchema)
     .mutation(({ ctx, input }) => {
       return createModule(ctx.db, ctx.teacher.userId, input);
+    }),
+
+  getDetail: teacherProcedure
+    .input(z.object({ id: z.string() }))
+    .query(({ ctx, input }) => {
+      return getModuleDetail(ctx.db, input.id, ctx.teacher.userId);
     }),
 });
