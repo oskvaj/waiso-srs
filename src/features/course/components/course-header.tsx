@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { DescriptionBlock } from "./description-block";
 import { CourseName } from "./course-name";
+import { DeleteCourseDialog } from "./delete-course-dialog";
+import { PublishCourseDialog } from "./publish-course-dialog";
 
 export function CourseHeader({ course }: { course: CourseOverview }) {
   const router = useRouter();
@@ -55,11 +57,15 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
           />
         </div>
 
-        {!course.published && (
-          <span className="bg-theme-action/15 text-theme-action rounded-full px-4 py-1 text-sm font-medium">
-            Draft
-          </span>
-        )}
+        <div className="flex shrink-0 items-center gap-2">
+          {!course.published && (
+            <PublishCourseDialog
+              courseId={course.id}
+              courseName={course.name}
+            />
+          )}
+          <DeleteCourseDialog courseId={course.id} courseName={course.name} />
+        </div>
       </div>
     </div>
   );
