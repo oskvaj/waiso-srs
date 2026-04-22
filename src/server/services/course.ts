@@ -233,6 +233,33 @@ export async function deleteCourse(
   return { id: courseId };
 }
 
+export async function publishCourse(
+  db: PrismaClient,
+  courseId: string,
+  teacherId: string,
+): Promise<{ id: string }> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: { teacherId: true, published: true },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+  if (course.published) {
+    throw new TRPCError({ code: "BAD_REQUEST", message: "ALready published" });
+  }
+
+  return db.course.update({
+    where: { id: courseId },
+    data: { published: true },
+    select: { id: true },
+  });
+}
+
 export async function assertCourseOwnership(
   db: PrismaClient,
   courseId: string,
