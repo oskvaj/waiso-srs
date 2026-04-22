@@ -1,9 +1,22 @@
+"use client";
+
 import type { CourseOverview } from "@/server/services/course";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 import { DescriptionBlock } from "./description-block";
+import { CourseName } from "./course-name";
 
 export function CourseHeader({ course }: { course: CourseOverview }) {
+  const router = useRouter();
+
+  const updateCourse = api.course.update.useMutation({
+    onSuccess: () => {
+      router.refresh();
+    },
+  });
+
   return (
     <div>
       <Link
@@ -15,10 +28,14 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
       </Link>
 
       <div className="flex items-start justify-between">
-        <div>
-          <h1 className="font-theme-heading text-3xl font-bold">
-            {course.name}
-          </h1>
+        <div className="min-w-0 flex-1">
+          <CourseName
+            value={course.name}
+            onSaveAction={(name) =>
+              updateCourse.mutate({ id: course.id, name })
+            }
+          />
+
           <p className="text-theme-muted mt-1 text-sm">
             {course.modulesCount} modules • {course.questionsCount} questions
             {course.studentsCount > 0 && (
@@ -29,9 +46,13 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
               </>
             )}
           </p>
-          {course.description && (
-            <DescriptionBlock description={course.description} />
-          )}
+
+          <DescriptionBlock
+            description={course.description}
+            onSaveAction={(description) =>
+              updateCourse.mutate({ id: course.id, description })
+            }
+          />
         </div>
 
         {!course.published && (
