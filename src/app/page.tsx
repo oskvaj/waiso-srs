@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import { Module } from "@/features/module/module";
 import { auth } from "@/server/auth";
 import { HydrateClient } from "@/trpc/server";
 import { env } from "@/env";
@@ -12,8 +11,8 @@ export default async function Home() {
     <HydrateClient>
       <main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <div>
-            <Module />
+          <div className="text-4xl">
+            <Link href="/courses">Courses Link</Link>
           </div>
           <div>{session ? "You are signed in" : "You are not signed in"}</div>
           <div className="flex flex-col items-center gap-2">
