@@ -16,5 +16,9 @@ export default async function ModuleEditorPage({
     notFound();
   }
 
-  return <ModuleEditor module={mod} />;
+  return (
+    <div className="h-full overflow-hidden pb-10">
+      <ModuleEditor module={mod} />
+    </div>
+  );
 }

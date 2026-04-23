@@ -42,8 +42,7 @@ export function TipTapEditor({
     },
     editorProps: {
       attributes: {
-        class:
-          "prose prose-sm max-w-none focus:outline-none min-h-[200px] px-4 py-3",
+        class: "prose prose-sm max-w-none focus:outline-none h-full px-4 py-3",
         style: "overflow-wrap: break-word; word-break: break-word;",
       },
     },
@@ -52,9 +51,11 @@ export function TipTapEditor({
   if (!editor) return null;
 
   return (
-    <div>
+    <div className="flex h-full flex-col">
       {editable && <EditorToolbar editor={editor} />}
-      <EditorContent editor={editor} />
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <EditorContent editor={editor} />
+      </div>
     </div>
   );
 }

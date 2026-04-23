@@ -23,7 +23,7 @@ export default async function CourseOverviewPage({
   }
 
   return (
-    <div className="space-y-8">
+    <div className="h-full space-y-8 pb-20">
       <CourseHeader course={course} />
       <ModulesSection modules={modules} courseId={id} />
       <StudentsSection students={students} />

@@ -6,9 +6,11 @@ export default function TeacherLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-theme-page text-theme-text min-h-screen">
+    <div className="bg-theme-page text-theme-text flex h-dvh flex-col">
       <TeacherHeader />
-      <main className="mx-auto max-w-7xl px-10 pt-10 pb-30">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-10 py-5">
+        {children}
+      </main>
     </div>
   );
 }
