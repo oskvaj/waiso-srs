@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
 import { DescriptionBlock } from "./description-block";
-import { CourseName } from "./course-name";
+import { EditableName } from "./editable-name";
 import { DeleteCourseDialog } from "./delete-course-dialog";
 import { PublishCourseDialog } from "./publish-course-dialog";
 
@@ -31,7 +31,7 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
 
       <div className="flex items-start justify-between">
         <div className="min-w-0 flex-1">
-          <CourseName
+          <EditableName
             value={course.name}
             onSaveAction={(name) =>
               updateCourse.mutate({ id: course.id, name })

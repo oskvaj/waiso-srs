@@ -1,6 +1,6 @@
 "use client";
 
-import { CourseName } from "@/features/course/components/course-name";
+import { EditableName } from "@/features/course/components/editable-name";
 import type { ModuleDetail } from "@/server/services/module";
 import { api } from "@/trpc/react";
 import { ArrowLeft } from "lucide-react";
@@ -27,7 +27,7 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
           {module.courseName}
         </Link>
       </div>
-      <CourseName
+      <EditableName
         value={module.name}
         onSaveAction={(name) => updateModule.mutate({ id: module.id, name })}
       />

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Pencil } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
-export function CourseName({
+export function EditableName({
   value,
   onSaveAction: onSave,
 }: {
