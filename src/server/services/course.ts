@@ -2,6 +2,7 @@ import type { PrismaClient } from "@/../generated/prisma";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 import { calculateAvgCourseProgress } from "./progress";
+import { PASSED_LEVEL, MAX_LEVEL } from "@/lib/constants";
 
 export type CourseListItem = {
   id: string;
@@ -13,6 +14,54 @@ export type CourseListItem = {
   avgProgress: number; // 0-1
   avgMastery: number; // 0-1
 };
+
+export type StudentCourseListItem = {
+  id: string;
+  name: string;
+  modulesCount: number;
+  Progress: number; // 0-1
+  Mastery: number; // 0-1
+};
+
+export async function listCoursesForStudent(
+  db: PrismaClient,
+  studentId: string,
+): Promise<StudentCourseListItem[]> {
+  const studentCoursePairs = await db.studentInCourse.findMany({
+    where: { studentId },
+    orderBy: { createdAt: "desc" },
+    include: {
+      course: {
+        select: {
+          id: true,
+          name: true,
+          _count: { select: { modules: true } },
+        },
+      },
+      ModuleProgress: {
+        select: { level: true },
+      },
+    },
+  });
+
+  return studentCoursePairs.map((studentCoursePair) => {
+    const totalLevels = studentCoursePair.ModuleProgress.reduce(
+      (sum, mp) => sum + mp.level,
+      0,
+    );
+
+    return {
+      id: studentCoursePair.course.id,
+      name: studentCoursePair.course.name,
+      modulesCount: studentCoursePair.course._count.modules,
+      Progress: studentCoursePair.ModuleProgress.filter(
+        (mp) => mp.level >= PASSED_LEVEL,
+      ).length,
+      Mastery:
+        totalLevels / (studentCoursePair.ModuleProgress.length * MAX_LEVEL),
+    };
+  });
+}
 
 export async function listCoursesForTeacher(
   db: PrismaClient,

@@ -153,3 +153,20 @@ export const teacherProcedure = protectedProcedure.use(
     });
   },
 );
+
+export const studentProcedure = protectedProcedure.use(
+  async ({ ctx, next }) => {
+    const student = await ctx.db.student.findUnique({
+      where: { userId: ctx.session.user.id },
+    });
+
+    if (!student) {
+      throw new TRPCError({ code: "FORBIDDEN", message: "Not a student" });
+    }
+    return next({
+      ctx: {
+        student,
+      },
+    });
+  },
+);

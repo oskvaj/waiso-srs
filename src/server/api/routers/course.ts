@@ -7,13 +7,18 @@ import {
   updateCourse,
   updateCourseSchema,
   publishCourse,
+  listCoursesForStudent,
 } from "@/server/services/course";
-import { createTRPCRouter, teacherProcedure } from "../trpc";
+import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
 import z from "zod";
 
 export const courseRouter = createTRPCRouter({
   listMine: teacherProcedure.query(({ ctx }) => {
     return listCoursesForTeacher(ctx.db, ctx.teacher.userId);
+  }),
+
+  listForStudent: studentProcedure.query(({ ctx }) => {
+    return listCoursesForStudent(ctx.db, ctx.student.userId);
   }),
 
   create: teacherProcedure
