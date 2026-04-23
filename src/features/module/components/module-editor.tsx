@@ -2,10 +2,20 @@
 
 import { CourseName } from "@/features/course/components/course-name";
 import type { ModuleDetail } from "@/server/services/module";
+import { api } from "@/trpc/react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export function ModuleEditor({ module }: { module: ModuleDetail }) {
+  const router = useRouter();
+
+  const updateModule = api.module.update.useMutation({
+    onSuccess: () => {
+      router.refresh();
+    },
+  });
+
   return (
     <div className="space-y-6">
       <div>
@@ -19,7 +29,7 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
       </div>
       <CourseName
         value={module.name}
-        onSaveAction={(name) => console.log(`new name: ${name}`)}
+        onSaveAction={(name) => updateModule.mutate({ id: module.id, name })}
       />
 
       <div className="text-theme-muted">Theory editor placeholder</div>

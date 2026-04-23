@@ -5,6 +5,8 @@ import {
   createModuleSchema,
   getModuleDetail,
   listModulesForTeacher,
+  updateModule,
+  updateModuleSchema,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -24,5 +26,11 @@ export const moduleRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return getModuleDetail(ctx.db, input.id, ctx.teacher.userId);
+    }),
+
+  update: teacherProcedure
+    .input(updateModuleSchema)
+    .mutation(({ ctx, input }) => {
+      return updateModule(ctx.db, ctx.teacher.userId, input);
     }),
 });

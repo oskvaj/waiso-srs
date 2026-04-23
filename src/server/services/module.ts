@@ -116,3 +116,47 @@ export async function getModuleDetail(
     courseName: mod.course.name,
   };
 }
+
+export const updateModuleSchema = z.object({
+  id: z.string(),
+  name: z
+    .string()
+    .trim()
+    .min(1, "Name is required")
+    .max(255, "Name is too long")
+    .optional(),
+  content: z.unknown().optional(),
+});
+export type UpdateModuleInput = z.infer<typeof updateModuleSchema>;
+
+export async function updateModule(
+  db: PrismaClient,
+  teacherId: string,
+  input: UpdateModuleInput,
+): Promise<{ id: string }> {
+  const mod = await db.module.findUnique({
+    where: { id: input.id },
+    include: {
+      course: {
+        select: { teacherId: true },
+      },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+
+  if (mod.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+
+  return db.module.update({
+    where: { id: input.id },
+    data: {
+      name: input.name,
+      content: input.content ?? undefined,
+    },
+    select: { id: true },
+  });
+}
