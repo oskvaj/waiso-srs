@@ -1,4 +1,4 @@
-import { PrismaClient } from "@/../generated/prisma";
+import { PrismaClient, QuestionType } from "@/../generated/prisma";
 
 const prisma = new PrismaClient();
 
@@ -93,6 +93,7 @@ async function main() {
           data: {
             name: `M${i + 1} Q${q + 1}`,
             moduleId: mod.id,
+            type: QuestionType.MULTIPLE_CHOICE,
             content: {
               question: `Question ${q + 1} about module ${i + 1}?`,
               answers: ["A", "B", "C", "D"],

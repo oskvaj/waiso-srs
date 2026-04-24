@@ -73,9 +73,16 @@ model Module {
     @@index([courseId])
 }
 
+enum QuestionType {
+    MULTIPLE_CHOICE
+    FREE_TEXT
+    PAIR
+}
+
 model Question {
-    id      String @id @default(cuid())
+    id      String       @id @default(cuid())
     name    String
+    type    QuestionType
     content Json
 
     correctAnswers Int @default(0) //Times a student got question correct
