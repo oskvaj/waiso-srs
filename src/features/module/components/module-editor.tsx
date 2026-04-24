@@ -6,7 +6,7 @@ import { EditableName } from "@/features/course/components/editable-name";
 import type { ModuleDetail } from "@/server/services/module";
 import { api } from "@/trpc/react";
 import type { JSONContent } from "@tiptap/react";
-import { ArrowLeft, SquarePen } from "lucide-react";
+import { MoveLeft, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -45,7 +45,7 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
           href={`/courses/${module.courseId}`}
           className="text-theme-muted hover:text-theme-text mb-2 inline-flex items-center gap-1 text-sm transition-colors"
         >
-          <ArrowLeft className="text-theme-primary size-4" />
+          <MoveLeft className="text-theme-primary size-6" />
           {module.courseName}
         </Link>
 

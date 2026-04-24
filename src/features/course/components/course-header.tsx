@@ -1,7 +1,7 @@
 "use client";
 
 import type { CourseOverview } from "@/server/services/course";
-import { ArrowLeft } from "lucide-react";
+import { MoveLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
@@ -23,9 +23,9 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
     <div>
       <Link
         href="/courses"
-        className="text-theme-muted hover:text-theme-text mb-4 inline-flex items-center gap-1 text-sm transition-colors"
+        className="text-theme-muted hover:text-theme-text mb-1 inline-flex items-center gap-1 text-sm transition-colors"
       >
-        <ArrowLeft className="text-theme-primary size-4" />
+        <MoveLeft className="text-theme-primary size-6" />
         Back to courses
       </Link>
 
