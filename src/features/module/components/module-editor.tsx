@@ -3,7 +3,9 @@
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { EditableName } from "@/features/course/components/editable-name";
+import { QuestionsPanel } from "@/features/question/components/questions-panel";
 import type { ModuleDetail } from "@/server/services/module";
+import type { QuestionListItem } from "@/server/services/question";
 import { api } from "@/trpc/react";
 import type { JSONContent } from "@tiptap/react";
 import { MoveLeft, SquarePen } from "lucide-react";
@@ -11,7 +13,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-export function ModuleEditor({ module }: { module: ModuleDetail }) {
+export function ModuleEditor({
+  module,
+  questions,
+}: {
+  module: ModuleDetail;
+  questions: QuestionListItem[];
+}) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
@@ -61,7 +69,7 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
 
       <div className="flex min-h-0 flex-1 gap-6">
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="mr-10 ml-5 flex h-10 shrink-0 items-center justify-between gap-3">
+          <div className="mx-5 flex h-10 shrink-0 items-center justify-between gap-3">
             <h2 className="font-theme-heading shrink-0 text-lg font-semibold">
               Theory
             </h2>
@@ -81,14 +89,14 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
                 </Button>
               </div>
             ) : (
-              <button
-                type="button"
+              <Button
+                variant="link"
                 onClick={() => setEditing(true)}
-                className="text-theme-primary hover:text-theme-primary/80 inline-flex items-center gap-1 px-2 py-1 font-bold transition-colors hover:cursor-pointer"
+                className="gap-1 px-2 py-1"
               >
                 <SquarePen className="size-4" />
                 Edit
-              </button>
+              </Button>
             )}
           </div>
           <div className="border-theme-border bg-theme-card min-h-0 flex-1 rounded-lg border">
@@ -101,7 +109,11 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
           </div>
         </div>
 
-        <div className="text-theme-muted">Questions list placeholder</div>
+        <QuestionsPanel
+          questions={questions}
+          moduleId={module.id}
+          courseId={module.courseId}
+        />
         <div className="text-theme-muted">Dependencies placeholder</div>
       </div>
     </div>

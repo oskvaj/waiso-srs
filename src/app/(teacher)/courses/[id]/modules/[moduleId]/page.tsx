@@ -9,16 +9,19 @@ export default async function ModuleEditorPage({
 }) {
   const { id, moduleId } = await params;
 
-  let mod;
+  let mod, questions;
   try {
-    mod = await api.module.getDetail({ id: moduleId });
+    [mod, questions] = await Promise.all([
+      api.module.getDetail({ id: moduleId }),
+      api.question.listByModule({ moduleId }),
+    ]);
   } catch {
     notFound();
   }
 
   return (
     <div className="h-full overflow-hidden pb-10">
-      <ModuleEditor module={mod} />
+      <ModuleEditor module={mod} questions={questions} />
     </div>
   );
 }
