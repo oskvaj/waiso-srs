@@ -84,7 +84,7 @@ export function ModuleEditor({ module }: { module: ModuleDetail }) {
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="text-theme-primary hover:text-theme-primary/80 inline-flex items-center gap-1 font-bold transition-colors hover:cursor-pointer"
+                className="text-theme-primary hover:text-theme-primary/80 inline-flex items-center gap-1 px-2 py-1 font-bold transition-colors hover:cursor-pointer"
               >
                 <SquarePen className="size-4" />
                 Edit
