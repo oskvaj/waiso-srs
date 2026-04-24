@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import { ChevronDown, ChevronUp, SquarePen } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 export function DescriptionBlock({
@@ -92,7 +92,7 @@ export function DescriptionBlock({
           }}
           className="text-theme-muted hover:text-theme-text shrink-0 opacity-50 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
         >
-          <Pencil className="size-3.5" />
+          <SquarePen className="size-3.5" />
         </button>
       </div>
       {(isClamped || expanded) && (

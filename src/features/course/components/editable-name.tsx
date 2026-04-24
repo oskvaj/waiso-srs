@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { SquarePen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export function EditableName({
@@ -50,7 +50,7 @@ export function EditableName({
         }}
         className="text-theme-muted hover:text-theme-text opacity-50 transition-opacity group-hover:opacity-100 hover:cursor-pointer"
       >
-        <Pencil className="size-4" />
+        <SquarePen className="size-4" />
       </button>
     </div>
   );
