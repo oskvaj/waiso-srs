@@ -68,6 +68,7 @@ export function PairEditor({
 
   return (
     <div className="space-y-3">
+      <h2 className="font-theme-heading mb-2 text-sm font-semibold">Pairs</h2>
       {entries.map((pair, index) => {
         const leftError = errors.some((e) => e.field === `pair-${index}-left`);
         const rightError = errors.some(
