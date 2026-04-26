@@ -10,12 +10,14 @@ import { api } from "@/trpc/react";
 import type { QuestionDetail } from "@/server/services/question";
 import type { QuestionType } from "@/../generated/prisma";
 import {
+  type FreeTextContent,
   type MultipleChoiceContent,
   type QuestionContent,
   type ValidationError,
   validateQuestionErrors,
 } from "@/lib/question-types";
 import { MultipleChoiceEditor } from "./multiple-choice-editor";
+import { FreeTextEditor } from "./free-text-editor";
 
 const TYPES: { value: QuestionType; label: string }[] = [
   { value: "MULTIPLE_CHOICE", label: "Multiple choice" },
@@ -29,7 +31,7 @@ function getEmptyContent(type: QuestionType): QuestionContent {
     case "MULTIPLE_CHOICE":
       return { question: emptyDoc, answers: [] };
     case "FREE_TEXT":
-      return { question: emptyDoc, answer: emptyDoc };
+      return { question: emptyDoc, answers: [] };
     case "PAIR":
       return { question: emptyDoc, pairs: [] };
   }
@@ -186,7 +188,7 @@ export function QuestionEditor({
               <TipTapEditor
                 key={editing ? "edit-q" : "view-q"}
                 content={content.question}
-                onUpdateAction={(q) => {
+                onUpdate={(q) => {
                   setContent((prev) => ({ ...prev, question: q }));
                   setErrors((prev) =>
                     prev.filter((e) => e.field !== "question"),
@@ -204,16 +206,13 @@ export function QuestionEditor({
           </div>
 
           <div>
-            <h2 className="font-theme-heading mb-2 text-sm font-semibold">
-              Answers
-            </h2>
             {type === "MULTIPLE_CHOICE" && (
               <>
                 <MultipleChoiceEditor
                   key={editing ? "edit-mc" : "view-mc"}
                   content={content as MultipleChoiceContent}
                   editing={editing}
-                  onChangeAction={(updated) => {
+                  onChange={(updated) => {
                     setContent(updated);
                     setErrors((prev) =>
                       prev.filter((e) => !e.field.startsWith("answer")),
@@ -230,9 +229,26 @@ export function QuestionEditor({
               </>
             )}
             {type === "FREE_TEXT" && (
-              <div className="text-theme-muted text-sm">
-                Free text answer placeholder
-              </div>
+              <>
+                <FreeTextEditor
+                  key={editing ? "edit-ft" : "view-ft"}
+                  content={content as FreeTextContent}
+                  editing={editing}
+                  onChange={(updated) => {
+                    setContent(updated);
+                    setErrors((prev) =>
+                      prev.filter((e) => !e.field.startsWith("answer")),
+                    );
+                    setHasChanges(true);
+                  }}
+                  errors={errors}
+                />
+                {errors.find((e) => e.field === "answers") && (
+                  <p className="text-theme-danger mt-1 text-sm">
+                    {errors.find((e) => e.field === "answers")!.message}
+                  </p>
+                )}
+              </>
             )}
             {type === "PAIR" && (
               <div className="text-theme-muted text-sm">
@@ -250,7 +266,7 @@ export function QuestionEditor({
               <TipTapEditor
                 key={editing ? "edit-e" : "view-e"}
                 content={content.explanation ?? { type: "doc", content: [] }}
-                onUpdateAction={(e) => {
+                onUpdate={(e) => {
                   setContent((prev) => ({ ...prev, explanation: e }));
                   setHasChanges(true);
                 }}

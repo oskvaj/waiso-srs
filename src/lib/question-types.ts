@@ -9,7 +9,7 @@ export type MultipleChoiceContent = {
 
 export type FreeTextContent = {
   question: JSONContent;
-  answer: JSONContent;
+  answers: { text: string; fuzzy: boolean }[];
   explanation?: JSONContent;
 };
 
@@ -39,7 +39,12 @@ export const multipleChoiceContentSchema = z.object({
 
 export const freeTextContentSchema = z.object({
   question: jsonContent,
-  answer: jsonContent,
+  answers: z.array(
+    z.object({
+      text: z.string(),
+      fuzzy: z.boolean(),
+    }),
+  ),
   explanation: jsonContent.optional(),
 });
 
@@ -124,10 +129,20 @@ export function validateFreeText(content: FreeTextContent): ValidationError[] {
   if (isContentEmpty(content.question)) {
     errors.push({ field: "question", message: "Question text is required" });
   }
-  if (isContentEmpty(content.answer)) {
-    errors.push({ field: "answer", message: "Answer is required" });
+  if (content.answers.length === 0) {
+    errors.push({
+      field: "answers",
+      message: "At least one answer is required",
+    });
   }
-
+  for (let i = 0; i < content.answers.length; i++) {
+    if (!content.answers[i]!.text.trim()) {
+      errors.push({
+        field: `answer-${i}`,
+        message: `Answer ${i + 1} is empty`,
+      });
+    }
+  }
   return errors;
 }
 
