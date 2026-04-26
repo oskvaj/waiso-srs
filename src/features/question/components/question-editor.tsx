@@ -1,0 +1,224 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, Pencil } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { TipTapEditor } from "@/components/editor/tiptap-editor";
+import { api } from "@/trpc/react";
+import type { QuestionDetail } from "@/server/services/question";
+import type { QuestionType } from "@/../generated/prisma";
+import type { QuestionContent } from "@/lib/question-types";
+
+const TYPES: { value: QuestionType; label: string }[] = [
+  { value: "MULTIPLE_CHOICE", label: "Multiple choice" },
+  { value: "FREE_TEXT", label: "Free text" },
+  { value: "PAIR", label: "Pair" },
+];
+
+function getEmptyContent(type: QuestionType): QuestionContent {
+  const emptyDoc = { type: "doc" as const, content: [] };
+  switch (type) {
+    case "MULTIPLE_CHOICE":
+      return { question: emptyDoc, answers: [] };
+    case "FREE_TEXT":
+      return { question: emptyDoc, answer: emptyDoc };
+    case "PAIR":
+      return { question: emptyDoc, pairs: [] };
+  }
+}
+
+export function QuestionEditor({
+  courseId,
+  moduleId,
+  question,
+}: {
+  courseId: string;
+  moduleId: string;
+  question: QuestionDetail | null;
+}) {
+  const router = useRouter();
+  const isNew = question === null;
+
+  const [editing, setEditing] = useState(isNew);
+  const [hasChanges, setHasChanges] = useState(false);
+  const [type, setType] = useState<QuestionType>(
+    (question?.type as QuestionType) ?? "MULTIPLE_CHOICE",
+  );
+  const [content, setContent] = useState<QuestionContent>(
+    question?.content ?? getEmptyContent("MULTIPLE_CHOICE"),
+  );
+
+  const createQuestion = api.question.create.useMutation({
+    onSuccess: (data) => {
+      void router.replace(
+        `/courses/${courseId}/modules/${moduleId}/questions/${data.id}`,
+      );
+      router.refresh();
+    },
+  });
+
+  const updateQuestion = api.question.update.useMutation({
+    onSuccess: () => {
+      setHasChanges(false);
+      setEditing(false);
+      router.refresh();
+    },
+  });
+
+  function handleSave() {
+    if (isNew) {
+      createQuestion.mutate({
+        moduleId,
+        type,
+        content,
+      });
+    } else {
+      updateQuestion.mutate({
+        id: question.id,
+        type,
+        content,
+      });
+    }
+  }
+
+  function handleCancel() {
+    if (isNew) {
+      void router.push(`/courses/${courseId}/modules/${moduleId}`);
+    } else {
+      setContent(question.content);
+      setType(question.type as QuestionType);
+      setHasChanges(false);
+      setEditing(false);
+    }
+  }
+
+  const isPending = createQuestion.isPending || updateQuestion.isPending;
+
+  return (
+    <div className="flex h-full flex-col gap-6">
+      <div className="shrink-0">
+        <Link
+          href={`/courses/${courseId}/modules/${moduleId}`}
+          className="text-theme-muted hover:text-theme-text mb-2 inline-flex items-center gap-1 text-sm transition-colors"
+        >
+          <ArrowLeft className="text-theme-primary size-4" />
+          Back to module
+        </Link>
+
+        <div className="flex items-center justify-between">
+          <h1 className="font-theme-heading text-2xl font-bold">
+            {isNew ? "New question" : question.name}
+          </h1>
+
+          {editing ? (
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button
+                variant="success"
+                size="sm"
+                onClick={handleSave}
+                disabled={isPending}
+              >
+                {isPending ? "Saving..." : "Save"}
+              </Button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="text-theme-muted hover:text-theme-text opacity-50 transition-opacity hover:cursor-pointer hover:opacity-100"
+            >
+              <Pencil className="size-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 gap-6">
+        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto">
+          {editing && (
+            <div className="flex shrink-0 gap-2">
+              {TYPES.map((t) => (
+                <button
+                  key={t.value}
+                  type="button"
+                  onClick={() => {
+                    setType(t.value);
+                    setContent(getEmptyContent(t.value));
+                    setHasChanges(true);
+                  }}
+                  className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                    type === t.value
+                      ? "bg-theme-primary text-theme-inverse"
+                      : "bg-theme-subtle text-theme-muted hover:text-theme-text"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div>
+            <h2 className="font-theme-heading mb-2 text-sm font-semibold">
+              Question
+            </h2>
+            <div className="border-theme-border bg-theme-card rounded-lg border">
+              <TipTapEditor
+                key={editing ? "edit-q" : "view-q"}
+                content={content.question}
+                onUpdateAction={(q) => {
+                  setContent((prev) => ({ ...prev, question: q }));
+                  setHasChanges(true);
+                }}
+                editable={editing}
+              />
+            </div>
+          </div>
+
+          <div>
+            <h2 className="font-theme-heading mb-2 text-sm font-semibold">
+              Answers
+            </h2>
+            {type === "MULTIPLE_CHOICE" && (
+              <div className="text-theme-muted text-sm">
+                Multiple choice answers placeholder
+              </div>
+            )}
+            {type === "FREE_TEXT" && (
+              <div className="text-theme-muted text-sm">
+                Free text answer placeholder
+              </div>
+            )}
+            {type === "PAIR" && (
+              <div className="text-theme-muted text-sm">
+                Pair matching placeholder
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h2 className="font-theme-heading mb-2 text-sm font-semibold">
+              Explanation (optional)
+            </h2>
+            <div className="border-theme-border bg-theme-card rounded-lg border">
+              <TipTapEditor
+                key={editing ? "edit-e" : "view-e"}
+                content={content.explanation ?? { type: "doc", content: [] }}
+                onUpdateAction={(e) => {
+                  setContent((prev) => ({ ...prev, explanation: e }));
+                  setHasChanges(true);
+                }}
+                editable={editing}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
