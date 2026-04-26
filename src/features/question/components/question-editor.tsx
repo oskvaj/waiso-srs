@@ -2,14 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { MoveLeft, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { api } from "@/trpc/react";
 import type { QuestionDetail } from "@/server/services/question";
 import type { QuestionType } from "@/../generated/prisma";
-import type { QuestionContent } from "@/lib/question-types";
+import {
+  type MultipleChoiceContent,
+  type QuestionContent,
+  type ValidationError,
+  validateQuestionErrors,
+} from "@/lib/question-types";
+import { MultipleChoiceEditor } from "./multiple-choice-editor";
 
 const TYPES: { value: QuestionType; label: string }[] = [
   { value: "MULTIPLE_CHOICE", label: "Multiple choice" },
@@ -49,6 +55,7 @@ export function QuestionEditor({
   const [content, setContent] = useState<QuestionContent>(
     question?.content ?? getEmptyContent("MULTIPLE_CHOICE"),
   );
+  const [errors, setErrors] = useState<ValidationError[]>([]);
 
   const createQuestion = api.question.create.useMutation({
     onSuccess: (data) => {
@@ -68,6 +75,13 @@ export function QuestionEditor({
   });
 
   function handleSave() {
+    const validationErrors = validateQuestionErrors(type, content);
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors([]);
+
     if (isNew) {
       createQuestion.mutate({
         moduleId,
@@ -103,7 +117,7 @@ export function QuestionEditor({
           href={`/courses/${courseId}/modules/${moduleId}`}
           className="text-theme-muted hover:text-theme-text mb-2 inline-flex items-center gap-1 text-sm transition-colors"
         >
-          <ArrowLeft className="text-theme-primary size-4" />
+          <MoveLeft className="text-theme-primary size-6" />
           Back to module
         </Link>
 
@@ -132,7 +146,7 @@ export function QuestionEditor({
               onClick={() => setEditing(true)}
               className="text-theme-muted hover:text-theme-text opacity-50 transition-opacity hover:cursor-pointer hover:opacity-100"
             >
-              <Pencil className="size-4" />
+              <SquarePen className="size-4" />
             </button>
           )}
         </div>
@@ -167,17 +181,25 @@ export function QuestionEditor({
             <h2 className="font-theme-heading mb-2 text-sm font-semibold">
               Question
             </h2>
-            <div className="border-theme-border bg-theme-card rounded-lg border">
+            <div className="border-theme-border bg-theme-card min-h-30 rounded-lg border">
               <TipTapEditor
                 key={editing ? "edit-q" : "view-q"}
                 content={content.question}
                 onUpdateAction={(q) => {
                   setContent((prev) => ({ ...prev, question: q }));
+                  setErrors((prev) =>
+                    prev.filter((e) => e.field !== "question"),
+                  );
                   setHasChanges(true);
                 }}
                 editable={editing}
               />
             </div>
+            {errors.find((e) => e.field === "question") && (
+              <p className="text-theme-danger mt-1 text-sm">
+                {errors.find((e) => e.field === "question")!.message}
+              </p>
+            )}
           </div>
 
           <div>
@@ -185,9 +207,25 @@ export function QuestionEditor({
               Answers
             </h2>
             {type === "MULTIPLE_CHOICE" && (
-              <div className="text-theme-muted text-sm">
-                Multiple choice answers placeholder
-              </div>
+              <>
+                <MultipleChoiceEditor
+                  content={content as MultipleChoiceContent}
+                  editing={editing}
+                  onChangeAction={(updated) => {
+                    setContent(updated);
+                    setErrors((prev) =>
+                      prev.filter((e) => !e.field.startsWith("answer")),
+                    );
+                    setHasChanges(true);
+                  }}
+                  errors={errors}
+                />
+                {errors.find((e) => e.field === "answers") && (
+                  <p className="text-theme-danger mt-1 text-sm">
+                    {errors.find((e) => e.field === "answers")!.message}
+                  </p>
+                )}
+              </>
             )}
             {type === "FREE_TEXT" && (
               <div className="text-theme-muted text-sm">
@@ -203,7 +241,8 @@ export function QuestionEditor({
 
           <div>
             <h2 className="font-theme-heading mb-2 text-sm font-semibold">
-              Explanation (optional)
+              Explanation{" "}
+              <span className="text-theme-muted font-normal">(optional)</span>
             </h2>
             <div className="border-theme-border bg-theme-card rounded-lg border">
               <TipTapEditor

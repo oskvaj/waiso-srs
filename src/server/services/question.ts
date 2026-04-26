@@ -2,6 +2,7 @@ import { type PrismaClient } from "@/../generated/prisma";
 import { QUESTION_TYPE_VALUES } from "@/lib/constants";
 import {
   validateQuestionContent,
+  validateQuestionErrors,
   type QuestionContent,
 } from "@/lib/question-types";
 import { extractTextFromContent } from "@/lib/tiptap-utils";
@@ -116,6 +117,15 @@ export async function createQuestion(
   }
 
   const validated = validateQuestionContent(input.type, input.content);
+
+  const errors = validateQuestionErrors(input.type, validated);
+  if (errors.length > 0) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: errors.map((e) => e.message).join(", "),
+    });
+  }
+
   const name = extractTextFromContent(validated.question);
 
   return db.question.create({
@@ -162,6 +172,15 @@ export async function updateQuestion(
   const type = input.type ?? question.type;
   const rawContent = input.content ?? question.content;
   const validated = validateQuestionContent(type, rawContent);
+
+  const errors = validateQuestionErrors(type, validated);
+  if (errors.length > 0) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: errors.map((e) => e.message).join(", "),
+    });
+  }
+
   const name = extractTextFromContent(validated.question);
 
   return db.question.update({
