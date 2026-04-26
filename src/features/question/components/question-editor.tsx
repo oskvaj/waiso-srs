@@ -200,6 +200,7 @@ export function QuestionEditor({
                 editable={editing}
               />
             </div>
+            {/* TODO: some bugs with errors not clearing here  */}
             {errors.find((e) => e.field === "question") && (
               <p className="text-theme-danger mt-1 text-sm">
                 {errors.find((e) => e.field === "question")!.message}
