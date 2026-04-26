@@ -12,12 +12,10 @@ export function TipTapEditor({
   content,
   onUpdateAction: onUpdateAction,
   editable = true,
-  placeholder,
 }: {
   content: JSONContent;
   onUpdateAction: (content: JSONContent) => void;
   editable?: boolean;
-  placeholder?: string;
 }) {
   const editor = useEditor({
     extensions: [
