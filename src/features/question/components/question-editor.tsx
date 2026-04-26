@@ -12,12 +12,14 @@ import type { QuestionType } from "@/../generated/prisma";
 import {
   type FreeTextContent,
   type MultipleChoiceContent,
+  type PairContent,
   type QuestionContent,
   type ValidationError,
   validateQuestionErrors,
 } from "@/lib/question-types";
 import { MultipleChoiceEditor } from "./multiple-choice-editor";
 import { FreeTextEditor } from "./free-text-editor";
+import { PairEditor } from "./pair-editor";
 
 const TYPES: { value: QuestionType; label: string }[] = [
   { value: "MULTIPLE_CHOICE", label: "Multiple choice" },
@@ -251,9 +253,26 @@ export function QuestionEditor({
               </>
             )}
             {type === "PAIR" && (
-              <div className="text-theme-muted text-sm">
-                Pair matching placeholder
-              </div>
+              <>
+                <PairEditor
+                  key={editing ? "edit-pair" : "view-pair"}
+                  content={content as PairContent}
+                  editing={editing}
+                  onChange={(updated) => {
+                    setContent(updated);
+                    setErrors((prev) =>
+                      prev.filter((e) => !e.field.startsWith("pair")),
+                    );
+                    setHasChanges(true);
+                  }}
+                  errors={errors}
+                />
+                {errors.find((e) => e.field === "pairs") && (
+                  <p className="text-theme-danger mt-1 text-sm">
+                    {errors.find((e) => e.field === "pairs")!.message}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
