@@ -1,5 +1,3 @@
-"use client";
-
 import CodeBlock from "@tiptap/extension-code-block";
 import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
@@ -10,11 +8,11 @@ import { EditorToolbar } from "./editor-toolbar";
 
 export function TipTapEditor({
   content,
-  onUpdateAction: onUpdateAction,
+  onUpdate,
   editable = true,
 }: {
   content: JSONContent;
-  onUpdateAction: (content: JSONContent) => void;
+  onUpdate: (content: JSONContent) => void;
   editable?: boolean;
 }) {
   const editor = useEditor({
@@ -36,7 +34,7 @@ export function TipTapEditor({
     editable,
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
-      onUpdateAction?.(editor.getJSON());
+      onUpdate?.(editor.getJSON());
     },
     editorProps: {
       attributes: {

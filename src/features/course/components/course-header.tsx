@@ -33,9 +33,7 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
         <div className="min-w-0 flex-1">
           <EditableName
             value={course.name}
-            onSaveAction={(name) =>
-              updateCourse.mutate({ id: course.id, name })
-            }
+            onSave={(name) => updateCourse.mutate({ id: course.id, name })}
           />
 
           <p className="text-theme-muted mt-1 text-sm">
@@ -51,7 +49,7 @@ export function CourseHeader({ course }: { course: CourseOverview }) {
 
           <DescriptionBlock
             description={course.description}
-            onSaveAction={(description) =>
+            onSave={(description) =>
               updateCourse.mutate({ id: course.id, description })
             }
           />

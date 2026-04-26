@@ -1,15 +1,13 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, SquarePen } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 
 export function DescriptionBlock({
   description,
-  onSaveAction: onSave,
+  onSave,
 }: {
   description: string | null;
-  onSaveAction: (value: string) => void;
+  onSave: (value: string) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);

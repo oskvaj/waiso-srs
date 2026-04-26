@@ -1,15 +1,13 @@
-"use client";
-
 import { useState } from "react";
 import { SquarePen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 export function EditableName({
   value,
-  onSaveAction: onSave,
+  onSave,
 }: {
   value: string;
-  onSaveAction: (name: string) => void;
+  onSave: (name: string) => void;
 }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(value);

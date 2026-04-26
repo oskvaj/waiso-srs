@@ -60,9 +60,7 @@ export function ModuleEditor({
         <div className="flex items-start justify-between">
           <EditableName
             value={module.name}
-            onSaveAction={(name) =>
-              updateModule.mutate({ id: module.id, name })
-            }
+            onSave={(name) => updateModule.mutate({ id: module.id, name })}
           />
         </div>
       </div>
@@ -103,7 +101,7 @@ export function ModuleEditor({
             <TipTapEditor
               key={editing ? "edit" : "view"}
               content={content!}
-              onUpdateAction={handleContentUpdate}
+              onUpdate={handleContentUpdate}
               editable={editing}
             />
           </div>

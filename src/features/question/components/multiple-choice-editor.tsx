@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -32,12 +30,12 @@ function fromEntries(entries: AnswerEntry[]): MultipleChoiceContent["answers"] {
 export function MultipleChoiceEditor({
   content,
   editing,
-  onChangeAction,
+  onChange,
   errors = [],
 }: {
   content: MultipleChoiceContent;
   editing: boolean;
-  onChangeAction: (content: MultipleChoiceContent) => void;
+  onChange: (content: MultipleChoiceContent) => void;
   errors?: ValidationError[];
 }) {
   const [entries, setEntries] = useState<AnswerEntry[]>(
@@ -46,7 +44,7 @@ export function MultipleChoiceEditor({
 
   function update(newEntries: AnswerEntry[]) {
     setEntries(newEntries);
-    onChangeAction({ ...content, answers: fromEntries(newEntries) });
+    onChange({ ...content, answers: fromEntries(newEntries) });
   }
 
   function addAnswer() {
@@ -72,6 +70,7 @@ export function MultipleChoiceEditor({
 
   return (
     <div className="space-y-3">
+      <h2 className="font-theme-heading mb-2 text-sm font-semibold">Options</h2>
       {entries.map((answer) => (
         <div
           key={answer.key}
@@ -129,7 +128,7 @@ export function MultipleChoiceEditor({
             <TipTapEditor
               key={editing ? `edit-${answer.key}` : `view-${answer.key}`}
               content={answer.text}
-              onUpdateAction={(text) => updateAnswerText(answer.key, text)}
+              onUpdate={(text) => updateAnswerText(answer.key, text)}
               editable={editing}
             />
           </div>
@@ -150,7 +149,7 @@ export function MultipleChoiceEditor({
           className="gap-1"
         >
           <Plus className="size-3.5" />
-          Add answer
+          Add option
         </Button>
       )}
     </div>
