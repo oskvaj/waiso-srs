@@ -122,7 +122,7 @@ export function QuestionEditor({
         </Link>
 
         <div className="flex items-center justify-between">
-          <h1 className="font-theme-heading text-2xl font-bold">
+          <h1 className="font-theme-heading truncate text-2xl font-bold">
             {isNew ? "New question" : question.name}
           </h1>
 
@@ -141,13 +141,14 @@ export function QuestionEditor({
               </Button>
             </div>
           ) : (
-            <button
-              type="button"
+            <Button
+              variant="link"
               onClick={() => setEditing(true)}
-              className="text-theme-muted hover:text-theme-text opacity-50 transition-opacity hover:cursor-pointer hover:opacity-100"
+              className="gap-1 px-2 py-1"
             >
               <SquarePen className="size-4" />
-            </button>
+              Edit
+            </Button>
           )}
         </div>
       </div>
@@ -209,6 +210,7 @@ export function QuestionEditor({
             {type === "MULTIPLE_CHOICE" && (
               <>
                 <MultipleChoiceEditor
+                  key={editing ? "edit-mc" : "view-mc"}
                   content={content as MultipleChoiceContent}
                   editing={editing}
                   onChangeAction={(updated) => {
@@ -244,7 +246,7 @@ export function QuestionEditor({
               Explanation{" "}
               <span className="text-theme-muted font-normal">(optional)</span>
             </h2>
-            <div className="border-theme-border bg-theme-card rounded-lg border">
+            <div className="border-theme-border bg-theme-card min-h-14 rounded-lg border">
               <TipTapEditor
                 key={editing ? "edit-e" : "view-e"}
                 content={content.explanation ?? { type: "doc", content: [] }}
