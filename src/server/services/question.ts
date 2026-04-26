@@ -1,7 +1,10 @@
 import { type PrismaClient } from "@/../generated/prisma";
 import { QUESTION_TYPE_VALUES } from "@/lib/constants";
+import {
+  validateQuestionContent,
+  type QuestionContent,
+} from "@/lib/question-types";
 import { extractTextFromContent } from "@/lib/tiptap-utils";
-import type { JSONContent } from "@tiptap/react";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 
@@ -46,7 +49,7 @@ export type QuestionDetail = {
   id: string;
   name: string;
   type: string;
-  content: unknown;
+  content: QuestionContent;
   moduleId: string;
   moduleName: string;
   courseId: string;
@@ -80,7 +83,7 @@ export async function getQuestionDetail(
     id: question.id,
     name: question.name,
     type: question.type,
-    content: question.content,
+    content: validateQuestionContent(question.type, question.content),
     moduleId: question.moduleId,
     moduleName: question.module.name,
     courseId: question.module.course.id,
@@ -112,17 +115,14 @@ export async function createQuestion(
     throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
   }
 
-  const content = input.content as Record<string, unknown>;
-  const questionContent = content.question as JSONContent | undefined;
-  const name = questionContent
-    ? extractTextFromContent(questionContent)
-    : "Untitled question";
+  const validated = validateQuestionContent(input.type, input.content);
+  const name = extractTextFromContent(validated.question);
 
   return db.question.create({
     data: {
       name,
       type: input.type,
-      content: input.content as object,
+      content: validated as unknown as object,
       moduleId: input.moduleId,
     },
     select: { id: true },
@@ -159,21 +159,17 @@ export async function updateQuestion(
     throw new TRPCError({ code: "FORBIDDEN", message: "Not your question" });
   }
 
-  const content = (input.content ?? question.content) as Record<
-    string,
-    unknown
-  >;
-  const questionContent = content.question as JSONContent | undefined;
-  const name = questionContent
-    ? extractTextFromContent(questionContent)
-    : question.name;
+  const type = input.type ?? question.type;
+  const rawContent = input.content ?? question.content;
+  const validated = validateQuestionContent(type, rawContent);
+  const name = extractTextFromContent(validated.question);
 
   return db.question.update({
     where: { id: input.id },
     data: {
       name,
       type: input.type,
-      content: input.content as object | undefined,
+      content: validated as unknown as object,
     },
     select: { id: true },
   });
