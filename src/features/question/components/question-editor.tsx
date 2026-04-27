@@ -20,6 +20,7 @@ import {
 import { MultipleChoiceEditor } from "./multiple-choice-editor";
 import { FreeTextEditor } from "./free-text-editor";
 import { PairEditor } from "./pair-editor";
+import { DeleteQuestionDialog } from "./delete-question-dialog";
 
 const TYPES: { value: QuestionType; label: string }[] = [
   { value: "MULTIPLE_CHOICE", label: "Multiple choice" },
@@ -145,14 +146,20 @@ export function QuestionEditor({
               </Button>
             </div>
           ) : (
-            <Button
-              variant="link"
-              onClick={() => setEditing(true)}
-              className="gap-1 px-2 py-1"
-            >
-              <SquarePen className="size-4" />
-              Edit
-            </Button>
+            <div className="flex items-center gap-4">
+              <Button
+                variant="link"
+                onClick={() => setEditing(true)}
+                className="gap-1 px-2 py-1"
+              >
+                <SquarePen className="size-4" />
+                Edit
+              </Button>
+              <DeleteQuestionDialog
+                questionId={question?.id}
+                questionName={question?.name}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -167,7 +174,14 @@ export function QuestionEditor({
                   type="button"
                   onClick={() => {
                     setType(t.value);
-                    setContent(getEmptyContent(t.value));
+                    setContent((prev) => {
+                      const empty = getEmptyContent(t.value);
+                      return {
+                        ...empty,
+                        question: prev.question,
+                        explanation: prev.explanation,
+                      };
+                    });
                     setHasChanges(true);
                   }}
                   className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
