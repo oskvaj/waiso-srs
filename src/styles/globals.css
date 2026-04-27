@@ -24,6 +24,7 @@
   --color-theme-border: var(--app-border);
   --color-theme-shadow: var(--app-shadow);
   --color-theme-primary: var(--app-primary);
+  --color-theme-secondary: var(--app-secondary);
   --color-theme-subtle: var(--app-subtle);
   --color-theme-action: var(--app-action);
   --color-theme-success: var(--app-success);
