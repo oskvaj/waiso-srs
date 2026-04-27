@@ -13,7 +13,7 @@ const TYPE_LABELS: Record<string, { label: string; class: string }> = {
   },
   PAIR: {
     label: "Pair",
-    class: "bg-theme-success/15 text-theme-success",
+    class: "bg-theme-secondary/15 text-theme-secondary",
   },
 };
 

@@ -31,10 +31,7 @@ export function ModulesSection({
           Modules ({modules.length})
         </h2>
         <div className="space-x-4">
-          <Button
-            variant="default"
-            className="hover:bg-theme-primary/80 items-center hover:cursor-pointer"
-          >
+          <Button variant="secondary" className="items-center">
             Dependency graph
           </Button>
           <AddModuleDialog courseId={courseId}>

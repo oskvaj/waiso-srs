@@ -91,7 +91,7 @@ export function FreeTextEditor({
               title={answer.fuzzy ? "Fuzzy matching on" : "Exact match"}
               className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
                 answer.fuzzy
-                  ? "bg-theme-action/15 text-theme-action"
+                  ? "bg-theme-secondary/15 text-theme-secondary"
                   : "bg-theme-subtle text-theme-muted"
               }`}
             >
