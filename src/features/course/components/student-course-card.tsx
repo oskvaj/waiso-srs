@@ -33,7 +33,7 @@ export function StudentCourseCard({
           </p>
 
           <div className="flex w-full items-center gap-2">
-            <div className="bg-theme-subtle h-3 flex-1 rounded-full border">
+            <div className="bg-theme-subtle h-3 flex-1 rounded-full">
               <div
                 className="bg-theme-primary text-theme-primary h-full rounded-full"
                 style={{ width: `${Math.round(Progress * 100)}%` }}
@@ -45,7 +45,7 @@ export function StudentCourseCard({
           </div>
 
           <div className="flex w-full items-center gap-2">
-            <div className="bg-theme-subtle h-3 flex-1 rounded-full border">
+            <div className="bg-theme-subtle h-3 flex-1 rounded-full">
               <div
                 className="bg-theme-secondary text-theme-secondary h-full rounded-full"
                 style={{ width: `${Math.round(Mastery * 100)}%` }}
