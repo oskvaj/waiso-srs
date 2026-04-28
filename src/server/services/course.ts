@@ -19,6 +19,7 @@ export type StudentCourseListItem = {
   id: string;
   name: string;
   modulesCount: number;
+  modulesUnlocked: number;
   Progress: number; // 0-1
   Mastery: number; // 0-1
 };
@@ -54,6 +55,9 @@ export async function listCoursesForStudent(
       id: studentCoursePair.course.id,
       name: studentCoursePair.course.name,
       modulesCount: studentCoursePair.course._count.modules,
+      modulesUnlocked: studentCoursePair.ModuleProgress.filter(
+        (module) => module.level !== 0,
+      ).length,
       Progress: studentCoursePair.ModuleProgress.filter(
         (mp) => mp.level >= PASSED_LEVEL,
       ).length,
