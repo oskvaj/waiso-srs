@@ -8,6 +8,7 @@ import Mathematics from "@tiptap/extension-mathematics";
 import { EditorToolbar } from "./editor-toolbar";
 import { useCallback, useRef, useState } from "react";
 import { MathDialog } from "./math-dialog";
+import { ImageUploadDialog } from "./image-upload-dialog";
 
 type MathEditState = {
   latex: string;
@@ -26,6 +27,7 @@ export function TipTapEditor({
   const editorRef = useRef<ReturnType<typeof useEditor>>(null);
   const [mathEdit, setMathEdit] = useState<MathEditState>(null);
   const [insertingMath, setInsertingMath] = useState(false);
+  const [insertingImage, setInsertingImage] = useState(false);
 
   const handleMathClick = useCallback(
     (node: { attrs: Record<string, unknown> }, pos: number) => {
@@ -83,6 +85,7 @@ export function TipTapEditor({
         <EditorToolbar
           editor={editor}
           onInsertMath={() => setInsertingMath(true)}
+          onInsertImage={() => setInsertingImage(true)}
         />
       )}
       <div className="min-h-0 flex-1 overflow-y-auto">
@@ -116,6 +119,14 @@ export function TipTapEditor({
           setMathEdit(null);
           setInsertingMath(false);
         }}
+      />
+      <ImageUploadDialog
+        open={insertingImage}
+        onUpload={(url) => {
+          editor.chain().focus().setImage({ src: url }).run();
+          setInsertingImage(false);
+        }}
+        onCancel={() => setInsertingImage(false)}
       />
     </div>
   );

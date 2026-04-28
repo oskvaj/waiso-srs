@@ -22,9 +22,11 @@ import {
 export function EditorToolbar({
   editor,
   onInsertMath,
+  onInsertImage,
 }: {
   editor: Editor;
   onInsertMath: () => void;
+  onInsertImage: () => void;
 }) {
   return (
     <div className="border-theme-border bg-theme-card sticky top-0 z-10 flex flex-wrap gap-0.5 rounded-t-lg border-b px-2 py-1.5">
@@ -140,15 +142,7 @@ export function EditorToolbar({
       <ToolbarDivider />
 
       <ToolbarGroup>
-        <ToolbarButton
-          onClick={() => {
-            const url = prompt("Image URL:");
-            if (url) {
-              editor.chain().focus().setImage({ src: url }).run();
-            }
-          }}
-          title="Insert image"
-        >
+        <ToolbarButton onClick={onInsertImage} title="Insert image">
           <ImagePlus className="size-4" />
         </ToolbarButton>
         <ToolbarButton onClick={onInsertMath} title="Insert math formula">
