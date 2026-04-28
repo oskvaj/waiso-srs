@@ -193,3 +193,32 @@ export async function updateQuestion(
     select: { id: true },
   });
 }
+
+export async function deleteQuestion(
+  db: PrismaClient,
+  teacherId: string,
+  questionId: string,
+): Promise<{ id: string }> {
+  const question = await db.question.findUnique({
+    where: { id: questionId },
+    include: {
+      module: {
+        include: {
+          course: { select: { teacherId: true } },
+        },
+      },
+    },
+  });
+
+  if (!question) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Question not found" });
+  }
+  if (question.module.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your question" });
+  }
+
+  return db.question.delete({
+    where: { id: questionId },
+    select: { id: true },
+  });
+}

@@ -18,22 +18,30 @@ import { api } from "@/trpc/react";
 export function DeleteQuestionDialog({
   questionId,
   questionName,
+  courseId,
+  moduleId,
 }: {
-  questionId: string | undefined;
-  questionName: string | undefined;
+  questionId: string;
+  questionName: string;
+  courseId: string;
+  moduleId: string;
 }) {
   const router = useRouter();
 
-  // const publishCourse = api.course.publish.useMutation({
-  //   onSuccess: () => {
-  //     router.refresh();
-  //   },
-  // });
+  const deleteQuestion = api.question.delete.useMutation({
+    onSuccess: () => {
+      void router.push(`/courses/${courseId}/modules/${moduleId}`);
+    },
+  });
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="destructive" size="sm">
+        <Button
+          variant="destructive"
+          size="sm"
+          className="hover:cursor-pointer"
+        >
           Delete question
         </Button>
       </AlertDialogTrigger>
@@ -47,11 +55,10 @@ export function DeleteQuestionDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={() => console.log("Delete question")}
-            className="bg-theme-danger text-theme-inverse hover:bg-theme-danger/90"
+            onClick={() => deleteQuestion.mutate({ id: questionId })}
+            className="bg-theme-danger text-theme-inverse hover:bg-theme-danger/90 hover:cursor-pointer"
           >
-            Delete
-            {/* {publishCourse.isPending ? "Publishing..." : "Publish"} */}
+            {deleteQuestion.isPending ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

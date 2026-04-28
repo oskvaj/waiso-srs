@@ -155,10 +155,16 @@ export function QuestionEditor({
                 <SquarePen className="size-4" />
                 Edit
               </Button>
-              <DeleteQuestionDialog
-                questionId={question?.id}
-                questionName={question?.name}
-              />
+              {!isNew && (
+                <>
+                  <DeleteQuestionDialog
+                    questionId={question.id}
+                    questionName={question.name}
+                    courseId={courseId}
+                    moduleId={moduleId}
+                  />
+                </>
+              )}
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@ import { createTRPCRouter, teacherProcedure } from "../trpc";
 import {
   createQuestion,
   createQuestionSchema,
+  deleteQuestion,
   getQuestionDetail,
   listQuestionsForModule,
   updateQuestion,
@@ -32,5 +33,11 @@ export const questionRouter = createTRPCRouter({
     .input(updateQuestionSchema)
     .mutation(({ ctx, input }) => {
       return updateQuestion(ctx.db, ctx.teacher.userId, input);
+    }),
+
+  delete: teacherProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return deleteQuestion(ctx.db, ctx.teacher.userId, input.id);
     }),
 });
