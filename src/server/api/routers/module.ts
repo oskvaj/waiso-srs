@@ -1,10 +1,11 @@
 import z from "zod";
-import { createTRPCRouter, teacherProcedure } from "../trpc";
+import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
 import {
   createModule,
   createModuleSchema,
   getModuleDetail,
   listModulesForTeacher,
+  listModulesForStudent,
   updateModule,
   updateModuleSchema,
 } from "@/server/services/module";
@@ -14,6 +15,12 @@ export const moduleRouter = createTRPCRouter({
     .input(z.object({ courseId: z.string() }))
     .query(({ ctx, input }) => {
       return listModulesForTeacher(ctx.db, input.courseId, ctx.teacher.userId);
+    }),
+
+  listForStudent: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(({ ctx, input }) => {
+      return listModulesForStudent(ctx.db, input.courseId, ctx.student.userId);
     }),
 
   create: teacherProcedure

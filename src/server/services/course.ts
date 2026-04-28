@@ -165,7 +165,6 @@ export async function getCourseOverview(
     include: {
       modules: {
         select: {
-          id: true,
           _count: { select: { questions: true } },
           moduleProgresses: {
             select: { studentId: true, level: true },
@@ -207,6 +206,80 @@ export async function getCourseOverview(
     questionsCount,
     studentsCount,
     ...progress,
+  };
+}
+
+export type StudentCourseOverview = {
+  id: string;
+  name: string;
+  description: string | null;
+  unlockedModules: number;
+  modulesCount: number;
+  levelsCount: number;
+  passedLevels: number;
+};
+
+export async function getStudentCourseOverview(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+): Promise<StudentCourseOverview> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: {
+      description: true,
+      name: true,
+      id: true,
+      _count: { select: { modules: true } },
+      modules: {
+        select: {
+          moduleProgresses: {
+            where: { studentId: studentId },
+            select: { level: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+
+  const modulesCount = course._count.modules;
+  const levelsCount = modulesCount * MAX_LEVEL;
+  const unlockedModules = course.modules.filter(
+    (m) => m.moduleProgresses.length > 0,
+  ).length;
+  const passedLevels = course.modules.reduce(
+    (sum, m) => sum + (m.moduleProgresses[0]?.level ?? 0),
+    0,
+  );
+
+  return {
+    id: course.id,
+    name: course.name,
+    description: course.description,
+    unlockedModules: unlockedModules,
+    modulesCount: modulesCount,
+    levelsCount: levelsCount,
+    passedLevels: passedLevels,
   };
 }
 
@@ -331,3 +404,10 @@ export async function assertCourseOwnership(
     throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
   }
 }
+
+export type StudentCourseProgress = {
+  passedModuleCount: number;
+  totalModuleCount: number;
+  passedLevelCount: number;
+  totalLevelCount: number;
+};
