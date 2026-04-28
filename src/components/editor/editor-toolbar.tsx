@@ -19,7 +19,13 @@ import {
   Undo,
 } from "lucide-react";
 
-export function EditorToolbar({ editor }: { editor: Editor }) {
+export function EditorToolbar({
+  editor,
+  onInsertMath,
+}: {
+  editor: Editor;
+  onInsertMath: () => void;
+}) {
   return (
     <div className="border-theme-border bg-theme-card sticky top-0 z-10 flex flex-wrap gap-0.5 rounded-t-lg border-b px-2 py-1.5">
       <ToolbarGroup>
@@ -145,22 +151,7 @@ export function EditorToolbar({ editor }: { editor: Editor }) {
         >
           <ImagePlus className="size-4" />
         </ToolbarButton>
-        <ToolbarButton
-          onClick={() => {
-            const latex = prompt("LaTeX formula:");
-            if (latex) {
-              editor
-                .chain()
-                .focus()
-                .insertContent({
-                  type: "inlineMath",
-                  attrs: { latex },
-                })
-                .run();
-            }
-          }}
-          title="Insert math formula"
-        >
+        <ToolbarButton onClick={onInsertMath} title="Insert math formula">
           <Sigma className="size-4" />
         </ToolbarButton>
       </ToolbarGroup>
