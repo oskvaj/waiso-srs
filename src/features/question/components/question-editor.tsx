@@ -140,7 +140,7 @@ export function QuestionEditor({
                 variant="success"
                 size="sm"
                 onClick={handleSave}
-                disabled={isPending}
+                disabled={isPending || !hasChanges}
               >
                 {isPending ? "Saving..." : "Save"}
               </Button>

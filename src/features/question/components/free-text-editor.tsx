@@ -69,7 +69,7 @@ export function FreeTextEditor({
         return (
           <div
             key={answer.key}
-            className={`flex items-center gap-2 rounded-lg border p-3 ${
+            className={`flex items-center gap-4 rounded-lg border p-3 ${
               hasError
                 ? "border-theme-danger bg-theme-danger/5"
                 : "border-theme-border bg-theme-card"
@@ -93,7 +93,7 @@ export function FreeTextEditor({
                 answer.fuzzy
                   ? "bg-theme-secondary/15 text-theme-secondary"
                   : "bg-theme-subtle text-theme-muted"
-              }`}
+              } ${editing ? "hover:cursor-pointer" : ""}`}
             >
               {answer.fuzzy ? "Fuzzy" : "Exact"}
             </button>
@@ -102,9 +102,9 @@ export function FreeTextEditor({
               <button
                 type="button"
                 onClick={() => removeAnswer(answer.key)}
-                className="text-theme-danger hover:text-theme-danger/80 shrink-0 p-1"
+                className="text-theme-danger hover:text-theme-danger/80 shrink-0 p-1 hover:cursor-pointer"
               >
-                <Trash2 className="size-3.5" />
+                <Trash2 className="size-4" />
               </button>
             )}
           </div>
