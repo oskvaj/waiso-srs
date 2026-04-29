@@ -1,9 +1,17 @@
 "use clinet";
 
-import { CircleUserRound } from "lucide-react";
+import { CircleUserRound, MoveLeft } from "lucide-react";
 import Link from "next/link";
 
-export function StudentHeader({ href, text }: { href: string; text: string }) {
+export function StudentHeader({
+  href,
+  text,
+  moveLeft = false,
+}: {
+  href: string;
+  text: string;
+  moveLeft?: boolean;
+}) {
   return (
     <header className="border-theme-border">
       <div className="flex h-14 items-center justify-between">
@@ -11,7 +19,10 @@ export function StudentHeader({ href, text }: { href: string; text: string }) {
           href={href}
           className="font-theme-heading text-theme-primary text-xl font-bold"
         >
-          {text}
+          <div className="flex items-center gap-2">
+            {moveLeft && <MoveLeft className="size-6" />}
+            {text}
+          </div>
         </Link>
 
         <div className="text-theme-muted flex items-center gap-4 text-sm">
