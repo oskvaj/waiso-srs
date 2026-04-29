@@ -3,12 +3,12 @@ import CodeBlock from "@tiptap/extension-code-block";
 import Underline from "@tiptap/extension-underline";
 import { EditorContent, useEditor, type JSONContent } from "@tiptap/react";
 import Starterkit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
 import Mathematics from "@tiptap/extension-mathematics";
 import { EditorToolbar } from "./editor-toolbar";
 import { useCallback, useRef, useState } from "react";
 import { MathDialog } from "./math-dialog";
 import { ImageUploadDialog } from "./image-upload-dialog";
+import ImageResize from "tiptap-extension-resize-image";
 
 type MathEditState = {
   latex: string;
@@ -45,10 +45,8 @@ export function TipTapEditor({
       }),
       Underline,
       CodeBlock,
-      Image.configure({
-        HTMLAttributes: {
-          class: "max-w-full rounded-lg",
-        },
+      ImageResize.configure({
+        minWidth: 50, // TODO: we're gonna need a maxWidth when the layout of the page is decided
       }),
       Mathematics.configure({
         katexOptions: {
@@ -123,7 +121,14 @@ export function TipTapEditor({
       <ImageUploadDialog
         open={insertingImage}
         onUpload={(url) => {
-          editor.chain().focus().setImage({ src: url }).run();
+          editor
+            .chain()
+            .focus()
+            .insertContent({
+              type: "imageResize",
+              attrs: { src: url },
+            })
+            .run();
           setInsertingImage(false);
         }}
         onCancel={() => setInsertingImage(false)}
