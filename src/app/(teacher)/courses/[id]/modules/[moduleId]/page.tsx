@@ -9,11 +9,13 @@ export default async function ModuleEditorPage({
 }) {
   const { id, moduleId } = await params;
 
-  let mod, questions;
+  let mod, questions, prerequisites, requiredFor;
   try {
-    [mod, questions] = await Promise.all([
+    [mod, questions, prerequisites, requiredFor] = await Promise.all([
       api.module.getDetail({ id: moduleId }),
       api.question.listByModule({ moduleId }),
+      api.module.listPrerequisites({ moduleId }),
+      api.module.listRequiredFor({ moduleId }),
     ]);
   } catch {
     notFound();
@@ -21,7 +23,12 @@ export default async function ModuleEditorPage({
 
   return (
     <div className="h-full overflow-hidden pb-10">
-      <ModuleEditor module={mod} questions={questions} />
+      <ModuleEditor
+        module={mod}
+        questions={questions}
+        prerequisites={prerequisites}
+        requiredFor={requiredFor}
+      />
     </div>
   );
 }

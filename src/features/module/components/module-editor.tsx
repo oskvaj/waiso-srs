@@ -4,7 +4,10 @@ import { TipTapEditor } from "@/components/editor/tiptap-editor";
 import { Button } from "@/components/ui/button";
 import { EditableName } from "@/features/course/components/editable-name";
 import { QuestionsPanel } from "@/features/question/components/questions-panel";
-import type { ModuleDetail } from "@/server/services/module";
+import type {
+  DependencyListItem,
+  ModuleDetail,
+} from "@/server/services/module";
 import type { QuestionListItem } from "@/server/services/question";
 import { api } from "@/trpc/react";
 import type { JSONContent } from "@tiptap/react";
@@ -12,13 +15,18 @@ import { MoveLeft, SquarePen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import { DependencyPanel } from "./dependency-panel";
 
 export function ModuleEditor({
   module,
   questions,
+  prerequisites,
+  requiredFor,
 }: {
   module: ModuleDetail;
   questions: QuestionListItem[];
+  prerequisites: DependencyListItem[];
+  requiredFor: DependencyListItem[];
 }) {
   const router = useRouter();
   const [editing, setEditing] = useState(false);
@@ -112,7 +120,13 @@ export function ModuleEditor({
           moduleId={module.id}
           courseId={module.courseId}
         />
-        <div className="text-theme-muted">Dependencies placeholder</div>
+
+        <DependencyPanel
+          prerequisites={prerequisites}
+          requiredFor={requiredFor}
+          moduleId={module.id}
+          courseId={module.courseId}
+        />
       </div>
     </div>
   );
