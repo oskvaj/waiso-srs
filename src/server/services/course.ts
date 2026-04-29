@@ -55,14 +55,15 @@ export async function listCoursesForStudent(
       id: studentCoursePair.course.id,
       name: studentCoursePair.course.name,
       modulesCount: studentCoursePair.course._count.modules,
-      modulesUnlocked: studentCoursePair.ModuleProgress.filter(
-        (module) => module.level !== 0,
-      ).length,
-      Progress: studentCoursePair.ModuleProgress.filter(
-        (mp) => mp.level >= PASSED_LEVEL,
-      ).length,
+      modulesUnlocked: studentCoursePair.ModuleProgress.length,
+      Progress:
+        studentCoursePair.course._count.modules > 0
+          ? studentCoursePair.ModuleProgress.filter(
+              (mp) => mp.level >= PASSED_LEVEL,
+            ).length / studentCoursePair.course._count.modules
+          : 0,
       Mastery:
-        totalLevels / (studentCoursePair.ModuleProgress.length * MAX_LEVEL),
+        totalLevels / (studentCoursePair.course._count.modules * MAX_LEVEL),
     };
   });
 }
