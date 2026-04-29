@@ -2,6 +2,26 @@ import { PrismaClient, QuestionType } from "@/../generated/prisma";
 
 const prisma = new PrismaClient();
 
+function doc(text: string) {
+  return {
+    type: "doc",
+    content: [
+      {
+        type: "paragraph",
+        content: [{ type: "text", text }],
+      },
+    ],
+  };
+}
+
+function mcAnswer(text: string, correct: boolean) {
+  return { text: doc(text), correct };
+}
+
+function pair(left: string, right: string) {
+  return { left: doc(left), right: doc(right) };
+}
+
 async function clearDatabase() {
   const tablenames = await prisma.$queryRaw<
     Array<{ tablename: string }>
@@ -54,28 +74,41 @@ async function main() {
       published: true,
       modules: 24,
       enrollStudents: 10,
+      description:
+        "An introduction to computer architecture, logic gates, and digital systems.",
     },
     {
       name: "Electrical circuits",
       published: true,
       modules: 18,
       enrollStudents: 8,
+      description:
+        "Fundamentals of circuit analysis, components, and signal processing.",
     },
-    { name: "Programming", published: true, modules: 20, enrollStudents: 6 },
+    {
+      name: "Programming",
+      published: true,
+      modules: 20,
+      enrollStudents: 6,
+      description:
+        "Learn programming concepts from variables and control flow to data structures and algorithms.",
+    },
     {
       name: "Data structures",
       published: false,
       modules: 8,
       enrollStudents: 0,
+      description:
+        "Advanced data structures including trees, graphs, and hash tables.",
     },
   ];
-
   for (const def of courses) {
     const course = await prisma.course.create({
       data: {
         name: def.name,
         published: def.published,
         teacherId: teacher.id,
+        description: def.description,
       },
     });
 
@@ -85,24 +118,110 @@ async function main() {
         data: {
           name: `Module ${i + 1}`,
           courseId: course.id,
-          content: { theory: `Theory for module ${i + 1}.` },
+          content: doc(`Theory content for module ${i + 1}.`),
         },
       });
-      for (let q = 0; q < 3; q++) {
-        await prisma.question.create({
-          data: {
-            name: `M${i + 1} Q${q + 1}`,
-            moduleId: mod.id,
-            type: QuestionType.MULTIPLE_CHOICE,
-            content: {
-              question: `Question ${q + 1} about module ${i + 1}?`,
-              answers: ["A", "B", "C", "D"],
-              correctAnswer: 0,
-            },
+
+      await prisma.question.create({
+        data: {
+          name: `Module ${i + 1} MC`,
+          moduleId: mod.id,
+          type: QuestionType.MULTIPLE_CHOICE,
+          content: {
+            question: doc(`What is the answer for module ${i + 1}?`),
+            answers: [
+              mcAnswer("Correct answer", true),
+              mcAnswer("Wrong answer A", false),
+              mcAnswer("Wrong answer B", false),
+              mcAnswer("Wrong answer C", false),
+            ],
+            explanation: doc(`The correct answer is the first one.`),
           },
-        });
-      }
+        },
+      });
+
+      await prisma.question.create({
+        data: {
+          name: `Module ${i + 1} FT`,
+          moduleId: mod.id,
+          type: QuestionType.FREE_TEXT,
+          content: {
+            question: doc(`Name a key concept from module ${i + 1}.`),
+            answers: [
+              { text: `concept ${i + 1}`, fuzzy: true },
+              { text: `Concept ${i + 1}`, fuzzy: false },
+            ],
+            explanation: doc(`The answer is "concept ${i + 1}".`),
+          },
+        },
+      });
+
+      await prisma.question.create({
+        data: {
+          name: `Module ${i + 1} Pair`,
+          moduleId: mod.id,
+          type: QuestionType.PAIR,
+          content: {
+            question: doc(`Match the terms for module ${i + 1}.`),
+            pairs: [
+              pair(`Term A${i + 1}`, `Definition A${i + 1}`),
+              pair(`Term B${i + 1}`, `Definition B${i + 1}`),
+              pair(`Term C${i + 1}`, `Definition C${i + 1}`),
+            ],
+          },
+        },
+      });
+
       modules.push(mod);
+    }
+
+    if (modules.length >= 6) {
+      await prisma.module.update({
+        where: { id: modules[2]!.id },
+        data: {
+          prerequisites: {
+            connect: [{ id: modules[1]!.id }],
+          },
+        },
+      });
+
+      await prisma.module.update({
+        where: { id: modules[3]!.id },
+        data: {
+          prerequisites: {
+            connect: [{ id: modules[1]!.id }],
+          },
+        },
+      });
+
+      await prisma.module.update({
+        where: { id: modules[4]!.id },
+        data: {
+          prerequisites: {
+            connect: [{ id: modules[2]!.id }, { id: modules[3]!.id }],
+          },
+        },
+      });
+
+      await prisma.module.update({
+        where: { id: modules[5]!.id },
+        data: {
+          prerequisites: {
+            connect: [{ id: modules[4]!.id }, { id: modules[0]!.id }],
+          },
+        },
+      });
+    }
+
+    for (let i = 6; i < modules.length; i++) {
+      await prisma.module.update({
+        where: { id: modules[i]!.id },
+        data: {
+          prerequisites: {
+            connect: [{ id: modules[5]!.id }],
+          },
+        },
+      });
     }
 
     for (let si = 0; si < def.enrollStudents; si++) {
