@@ -10,7 +10,7 @@ export function StudentModuleCard({
   courseId: string;
 }) {
   return (
-    <Link href={`/courses/${courseId}/modules/${module.id}`}>
+    <Link href={`/course/${courseId}/module/${module.id}`}>
       <Card
         variant="raised"
         className="hover:bg-theme-primary/5 aspect-square w-40 transition-colors"
