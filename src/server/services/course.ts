@@ -215,6 +215,7 @@ export type StudentCourseOverview = {
   name: string;
   description: string | null;
   unlockedModules: number;
+  passedModules: number;
   modulesCount: number;
   levelsCount: number;
   passedLevels: number;
@@ -268,6 +269,11 @@ export async function getStudentCourseOverview(
   const unlockedModules = course.modules.filter(
     (m) => m.moduleProgresses.length > 0,
   ).length;
+  const passedModules = course.modules.reduce(
+    (sum, m) =>
+      sum + ((m.moduleProgresses[0]?.level ?? 0) >= PASSED_LEVEL ? 1 : 0),
+    0,
+  );
   const passedLevels = course.modules.reduce(
     (sum, m) => sum + (m.moduleProgresses[0]?.level ?? 0),
     0,
@@ -278,6 +284,7 @@ export async function getStudentCourseOverview(
     name: course.name,
     description: course.description,
     unlockedModules: unlockedModules,
+    passedModules: passedModules,
     modulesCount: modulesCount,
     levelsCount: levelsCount,
     passedLevels: passedLevels,
@@ -407,6 +414,7 @@ export async function assertCourseOwnership(
 }
 
 export type StudentCourseProgress = {
+  unlockedModuleCount: number;
   passedModuleCount: number;
   totalModuleCount: number;
   passedLevelCount: number;

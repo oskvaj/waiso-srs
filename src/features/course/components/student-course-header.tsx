@@ -16,7 +16,8 @@ export function StudentCourseHeader({
   const parent = usePathname().split("/").slice(0, -1).join("/");
 
   const courseInfo: StudentCourseProgress = {
-    passedModuleCount: course.unlockedModules,
+    unlockedModuleCount: course.unlockedModules,
+    passedModuleCount: course.passedModules,
     totalModuleCount: course.modulesCount,
     passedLevelCount: course.passedLevels,
     totalLevelCount: course.levelsCount,
