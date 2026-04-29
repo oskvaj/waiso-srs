@@ -13,7 +13,8 @@ import {
   listModulesForStudent,
   updateModule,
   updateModuleSchema,
-  listDependenciesForModule,
+  listPrerequisites,
+  listRequiredFor,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -47,9 +48,15 @@ export const moduleRouter = createTRPCRouter({
       return updateModule(ctx.db, ctx.teacher.userId, input);
     }),
 
-  listDependencies: protectedProcedure
+  listPrerequisites: protectedProcedure
     .input(z.object({ moduleId: z.string() }))
     .query(({ ctx, input }) => {
-      return listDependenciesForModule(ctx.db, input.moduleId);
+      return listPrerequisites(ctx.db, input.moduleId);
+    }),
+
+  listRequiredFor: protectedProcedure
+    .input(z.object({ moduleId: z.string() }))
+    .query(({ ctx, input }) => {
+      return listRequiredFor(ctx.db, input.moduleId);
     }),
 });

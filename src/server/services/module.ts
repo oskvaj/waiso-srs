@@ -218,7 +218,7 @@ export type DependencyListItem = {
   name: string;
 };
 
-export async function listDependenciesForModule(
+export async function listPrerequisites(
   db: PrismaClient,
   moduleId: string,
 ): Promise<DependencyListItem[]> {
@@ -234,4 +234,22 @@ export async function listDependenciesForModule(
   }
 
   return mod.prerequisites;
+}
+
+export async function listRequiredFor(
+  db: PrismaClient,
+  moduleId: string,
+): Promise<DependencyListItem[]> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: {
+      requiredFor: { select: { id: true, name: true } },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+
+  return mod.requiredFor;
 }
