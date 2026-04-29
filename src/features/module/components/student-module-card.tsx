@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import type { StudentModuleListItem } from "@/server/services/module";
 import Link from "next/link";
 
@@ -13,18 +13,16 @@ export function StudentModuleCard({
     <Link href={`/courses/${courseId}/modules/${module.id}`}>
       <Card
         variant="raised"
-        className="hover:bg-theme-primary/5 h-full min-w-40 transition-colors"
+        className="hover:bg-theme-primary/5 aspect-square w-40 transition-colors"
       >
-        <CardHeader>
-          <CardTitle className="font-theme-heading truncate text-sm">
+        <CardHeader className="flex h-full flex-col items-center justify-between py-[10%]">
+          <CardTitle className="font-theme-heading line-clamp-2 text-center text-sm">
             {module.name}
           </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-color-primary space-y-2">
+          <div className="text-theme-primary text-center">
             Level {module.level}
           </div>
-        </CardContent>
+        </CardHeader>
       </Card>
     </Link>
   );
