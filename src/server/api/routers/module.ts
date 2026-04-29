@@ -1,5 +1,10 @@
 import z from "zod";
-import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  studentProcedure,
+  teacherProcedure,
+} from "../trpc";
 import {
   createModule,
   createModuleSchema,
@@ -8,6 +13,7 @@ import {
   listModulesForStudent,
   updateModule,
   updateModuleSchema,
+  listDependenciesForModule,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -29,7 +35,7 @@ export const moduleRouter = createTRPCRouter({
       return createModule(ctx.db, ctx.teacher.userId, input);
     }),
 
-  getDetail: teacherProcedure
+  getDetail: teacherProcedure // TODO: this can be normal protected procedure and used for both teacher and student
     .input(z.object({ id: z.string() }))
     .query(({ ctx, input }) => {
       return getModuleDetail(ctx.db, input.id, ctx.teacher.userId);
@@ -39,5 +45,11 @@ export const moduleRouter = createTRPCRouter({
     .input(updateModuleSchema)
     .mutation(({ ctx, input }) => {
       return updateModule(ctx.db, ctx.teacher.userId, input);
+    }),
+
+  listDependencies: protectedProcedure
+    .input(z.object({ moduleId: z.string() }))
+    .query(({ ctx, input }) => {
+      return listDependenciesForModule(ctx.db, input.moduleId);
     }),
 });

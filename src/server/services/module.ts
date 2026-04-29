@@ -156,6 +156,7 @@ export async function getModuleDetail(
   }
 
   if (mod.course.teacherId !== teaacherId) {
+    //TODO: No reason to check this teachers and student should be able to use this
     throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
   }
 
@@ -210,4 +211,27 @@ export async function updateModule(
     },
     select: { id: true },
   });
+}
+
+export type DependencyListItem = {
+  id: string;
+  name: string;
+};
+
+export async function listDependenciesForModule(
+  db: PrismaClient,
+  moduleId: string,
+): Promise<DependencyListItem[]> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: {
+      prerequisites: { select: { id: true, name: true } },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+
+  return mod.prerequisites;
 }
