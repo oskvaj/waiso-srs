@@ -1,5 +1,6 @@
 import { StudentCourseHeader } from "@/features/course/components/student-course-header";
 import { StudentModulesSection } from "@/features/module/components/student-module-selection";
+import { StudentReviewScheduleButton } from "@/features/module/components/student-module-timeline-button";
 import { StudentReviewButton } from "@/features/module/components/student-review-button";
 import { api } from "@/trpc/server";
 
@@ -26,6 +27,9 @@ export default async function CourseOverviewPage({
       </div>
       <div>
         <StudentModulesSection modules={modules} courseId={course.id} />
+      </div>
+      <div className="w-full max-w-100">
+        <StudentReviewScheduleButton id={id} />
       </div>
     </div>
   );
