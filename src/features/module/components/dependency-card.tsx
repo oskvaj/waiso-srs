@@ -19,7 +19,7 @@ export function DependencyCard({
         <button
           type="button"
           onClick={onRemove}
-          className="text-theme-muted hover:text-theme-danger shrink-0 p-1"
+          className="text-theme-muted/50 hover:text-theme-danger shrink-0 p-1 hover:cursor-pointer"
         >
           <Trash2 className="size-4" />
         </button>

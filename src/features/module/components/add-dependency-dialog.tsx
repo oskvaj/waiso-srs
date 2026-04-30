@@ -31,6 +31,30 @@ export function AddDependencyDialog({
     { enabled: open },
   );
 
+  const addPrerequisite = api.module.addPrerequisite.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      onOpenChange(false);
+    },
+  });
+
+  const addRequiredFor = api.module.addRequiredFor.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      onOpenChange(false);
+    },
+  });
+
+  function handleSelect(targetId: string) {
+    if (mode === "prerequisite") {
+      addPrerequisite.mutate({ moduleId, prerequisiteId: targetId });
+    } else {
+      addRequiredFor.mutate({ moduleId, targetModuleId: targetId });
+    }
+  }
+
+  const isPending = addPrerequisite.isPending || addRequiredFor.isPending;
+
   const availableModules = modules?.filter(
     (m) => m.id !== moduleId && !existingIds.includes(m.id),
   ); // TODO: add an endpoint for a better calculation of this
@@ -54,7 +78,8 @@ export function AddDependencyDialog({
             <button
               key={m.id}
               type="button"
-              onClick={() => console.log("temp")}
+              onClick={() => handleSelect(m.id)}
+              disabled={isPending}
               className="text-theme-text hover:bg-theme-subtle w-full rounded-lg px-3 py-2 text-left text-sm transition-colors"
             >
               {m.name}
