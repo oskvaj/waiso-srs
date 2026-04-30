@@ -238,6 +238,7 @@ async function main() {
             courseId: course.id,
             moduleId: modules[mi]!.id,
             level: mi < modulesWithProgress / 2 ? 8 : 3,
+            hasReadTheory: true,
           },
         });
       }

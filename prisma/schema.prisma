@@ -114,11 +114,12 @@ model StudentInCourse {
 }
 
 model ModuleProgress {
-    studentId  String
-    courseId   String
-    moduleId   String
-    level      Int       @default(0)
-    nextReview DateTime? //Next FULL HOUR when a review is scheduled, NULL if user has review active but has not done it
+    studentId     String
+    courseId      String
+    moduleId      String
+    level         Int       @default(0)
+    nextReview    DateTime? //Next FULL HOUR when a review is scheduled, NULL if user has review active but has not done it
+    hasReadTheory Boolean   @default(false)
 
     enrollment StudentInCourse @relation(fields: [studentId, courseId], references: [studentId, courseId])
     module     Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
