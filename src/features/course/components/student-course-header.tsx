@@ -26,7 +26,7 @@ export function StudentCourseHeader({
   return (
     <div>
       <div>
-        <StudentHeader href={parent} text={course.name} moveLeft={true} />
+        <StudentHeader href={parent} text={"Courses"} moveLeft={true} />
       </div>
       <div>
         <StudentCourseProgressCard courseInfo={courseInfo} />
