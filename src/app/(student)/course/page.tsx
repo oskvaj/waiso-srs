@@ -1,9 +1,11 @@
 import { StudentHeader } from "@/components/student-header";
 import { StudentCourseGrid } from "@/features/course/components/student-course-grid";
+import { StudentReviewButton } from "@/features/module/components/student-review-button";
 import { api } from "@/trpc/server";
 
 export default async function CoursesPage() {
   const courses = await api.course.listForStudent();
+  const courseIds = courses.map((course) => course.id);
 
   return (
     <div>
@@ -20,6 +22,7 @@ export default async function CoursesPage() {
             </p>
           </div>
         </div>
+        <StudentReviewButton courseIds={courseIds} />
 
         <StudentCourseGrid courses={courses} />
       </div>

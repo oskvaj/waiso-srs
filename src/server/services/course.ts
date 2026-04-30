@@ -420,3 +420,53 @@ export type StudentCourseProgress = {
   passedLevelCount: number;
   totalLevelCount: number;
 };
+
+export type StudentReviewsNeeded = {
+  totalForAllCoursesSent: number;
+};
+
+export async function reviewsDueNow(
+  db: PrismaClient,
+  courseIds: string[],
+  studentId: string,
+): Promise<StudentReviewsNeeded> {
+  await Promise.all(
+    courseIds.map(async (courseId) => {
+      try {
+        await db.studentInCourse.findUniqueOrThrow({
+          where: {
+            studentId_courseId: {
+              studentId: studentId,
+              courseId: courseId,
+            },
+          },
+        });
+      } catch (e) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Student not in course",
+        });
+      }
+    }),
+  );
+
+  const courses = await Promise.all(
+    courseIds.map((courseId) =>
+      db.moduleProgress.findMany({
+        where: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+        select: {
+          nextReview: true,
+        },
+      }),
+    ),
+  );
+
+  return {
+    totalForAllCoursesSent: courses
+      .flat()
+      .filter((mp) => mp.nextReview === null).length,
+  };
+}

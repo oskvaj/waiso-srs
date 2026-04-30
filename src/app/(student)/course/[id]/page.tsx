@@ -23,6 +23,7 @@ export default async function CourseOverviewPage({
       <div>
         <StudentModulesSection modules={modules} courseId={course.id} />
       </div>
+      <div>{/*TODO: Student reveiw cards*/}</div>
     </div>
   );
 }
