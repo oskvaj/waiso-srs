@@ -83,4 +83,26 @@ export const moduleRouter = createTRPCRouter({
         input.prerequisiteId,
       );
     }),
+
+  addRequiredFor: teacherProcedure
+    .input(z.object({ moduleId: z.string(), targetModuleId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return addPrerequisite(
+        ctx.db,
+        input.targetModuleId,
+        ctx.teacher.userId,
+        input.moduleId,
+      );
+    }),
+
+  removeRequiredFor: teacherProcedure
+    .input(z.object({ moduleId: z.string(), targetModuleId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return removePrerequisite(
+        ctx.db,
+        input.targetModuleId,
+        ctx.teacher.userId,
+        input.moduleId,
+      );
+    }),
 });
