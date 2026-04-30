@@ -12,9 +12,11 @@ export function MarkAsRead({
   moduleId: string;
   hasRead: boolean;
 }) {
+  const mutation = api.module.studentSetHasRead.useMutation();
+
   useEffect(() => {
     if (!hasRead) {
-      api.module.studentSetHasRead.useMutation().mutate({ courseId, moduleId });
+      mutation.mutate({ courseId, moduleId });
     }
   }, []);
 
