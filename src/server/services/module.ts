@@ -3,6 +3,7 @@ import { calculateAvgModuleProgress } from "./progress";
 import z from "zod";
 import { assertCourseOwnership } from "./course";
 import { TRPCError } from "@trpc/server";
+import { buildGraph, getAncestors, getDescendants } from "./module-graph";
 
 export type ModuleListItem = {
   id: string;
@@ -312,4 +313,97 @@ export async function removePrerequisite(
     },
     select: { id: true },
   });
+}
+
+async function getCourseModuleGraph(db: PrismaClient, courseId: string) {
+  const modules = await db.module.findMany({
+    where: { courseId },
+    select: {
+      id: true,
+      name: true,
+      prerequisites: { select: { id: true } },
+    },
+  });
+
+  return modules.map((m) => ({
+    id: m.id,
+    name: m.name,
+    prerequisiteIds: m.prerequisites.map((p) => p.id),
+  }));
+}
+
+export async function getAvailablePrerequisites(
+  db: PrismaClient,
+  moduleId: string,
+  teacherId: string,
+): Promise<DependencyListItem[]> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: {
+      course: { select: { id: true, teacherId: true } },
+      prerequisites: { select: { id: true } },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+  if (mod.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+
+  const modules = await getCourseModuleGraph(db, mod.course.id);
+
+  const { requiredForMap } = buildGraph(modules);
+
+  const descendants = getDescendants(moduleId, requiredForMap);
+
+  const existingPrereqIds = new Set(mod.prerequisites.map((p) => p.id));
+
+  return modules
+    .filter(
+      (m) =>
+        m.id !== moduleId &&
+        !existingPrereqIds.has(m.id) &&
+        !descendants.has(m.id),
+    )
+    .map((m) => ({ id: m.id, name: m.name }));
+}
+
+export async function getAvailableRequiredFor(
+  db: PrismaClient,
+  moduleId: string,
+  teacherId: string,
+): Promise<DependencyListItem[]> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: {
+      course: { select: { id: true, teacherId: true } },
+      requiredFor: { select: { id: true } },
+    },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+  if (mod.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+
+  const modules = await getCourseModuleGraph(db, mod.course.id);
+
+  const { prerequisiteMap } = buildGraph(modules);
+
+  const ancestors = getAncestors(moduleId, prerequisiteMap);
+
+  const existingRequiredForIds = new Set(mod.requiredFor.map((r) => r.id));
+
+  return modules
+    .filter(
+      (m) =>
+        m.id !== moduleId &&
+        !existingRequiredForIds.has(m.id) &&
+        !ancestors.has(m.id),
+    )
+    .map((m) => ({ id: m.id, name: m.name }));
 }

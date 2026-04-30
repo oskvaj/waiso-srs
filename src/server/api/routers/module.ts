@@ -17,6 +17,8 @@ import {
   listRequiredFor,
   addPrerequisite,
   removePrerequisite,
+  getAvailablePrerequisites,
+  getAvailableRequiredFor,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -103,6 +105,26 @@ export const moduleRouter = createTRPCRouter({
         input.targetModuleId,
         ctx.teacher.userId,
         input.moduleId,
+      );
+    }),
+
+  availablePrerequisites: teacherProcedure
+    .input(z.object({ moduleId: z.string() }))
+    .query(({ ctx, input }) => {
+      return getAvailablePrerequisites(
+        ctx.db,
+        input.moduleId,
+        ctx.teacher.userId,
+      );
+    }),
+
+  availableRequiredFor: teacherProcedure
+    .input(z.object({ moduleId: z.string() }))
+    .query(({ ctx, input }) => {
+      return getAvailableRequiredFor(
+        ctx.db,
+        input.moduleId,
+        ctx.teacher.userId,
       );
     }),
 });
