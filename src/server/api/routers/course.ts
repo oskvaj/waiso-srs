@@ -10,6 +10,7 @@ import {
   listCoursesForStudent,
   getStudentCourseOverview,
   reviewsDueNow,
+  getStudentReviewSchedule,
 } from "@/server/services/course";
 import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
 import z from "zod";
@@ -63,5 +64,15 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ courseIds: z.array(z.string()) }))
     .query(({ ctx, input }) => {
       return reviewsDueNow(ctx.db, input.courseIds, ctx.student.userId);
+    }),
+
+  getReviewSchedule: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(({ ctx, input }) => {
+      return getStudentReviewSchedule(
+        ctx.db,
+        input.courseId,
+        ctx.student.userId,
+      );
     }),
 });

@@ -470,3 +470,51 @@ export async function reviewsDueNow(
       .filter((mp) => mp.nextReview === null).length,
   };
 }
+
+export type StudentReviewschedule = {
+  moduleTimes: {
+    module: { name: string };
+    nextReview: Date | null;
+    moduleId: string;
+  }[];
+};
+
+export async function getStudentReviewSchedule(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+): Promise<StudentReviewschedule> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  const moduleTimes = await db.moduleProgress.findMany({
+    where: { courseId, studentId },
+    orderBy: { nextReview: "asc" },
+    select: {
+      module: { select: { name: true } },
+      nextReview: true,
+      moduleId: true,
+    },
+  });
+
+  moduleTimes.sort((a, b) => {
+    if (!a.nextReview) return -1;
+    if (!b.nextReview) return 1;
+    return a.nextReview.getTime() - b.nextReview.getTime();
+  });
+
+  return { moduleTimes };
+}
