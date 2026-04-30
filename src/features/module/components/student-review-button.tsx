@@ -13,7 +13,7 @@ export function StudentReviewButton({ courseIds }: { courseIds: string[] }) {
       variant="raised"
       className={`group h-full p-6 transition-colors ${
         reviewsDue && reviewsDue.totalForAllCoursesSent > 0
-          ? "bg-theme-action/25 hover:bg-theme-action/15 text-theme-action"
+          ? "bg-theme-action/25 hover:bg-theme-action/35 text-theme-action"
           : "text-theme-text"
       }`}
     >
