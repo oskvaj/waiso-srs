@@ -15,7 +15,7 @@ export function QuestionsPanel({
   courseId: string;
 }) {
   return (
-    <div className="flex h-full w-80 shrink-0 flex-col">
+    <div className="flex min-h-0 w-80 shrink-0 flex-col">
       <div className="flex h-10 shrink-0 items-center justify-between">
         <h2 className="font-theme-heading text-lg font-semibold">
           Questions ({questions.length})
@@ -28,7 +28,7 @@ export function QuestionsPanel({
         </Link>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5 pb-2">
         <AddQuestionCard courseId={courseId} moduleId={moduleId} />
         {questions.map((q) => (
           <QuestionCard

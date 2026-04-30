@@ -34,8 +34,8 @@ export function DependencyPanel({
   });
 
   return (
-    <div className="flex h-full w-64 shrink-0 flex-col gap-4">
-      <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex min-h-0 w-64 shrink-0 flex-col gap-6">
+      <div className="flex max-h-[48.5%] flex-col">
         <div className="mb-3 flex h-10 shrink-0 items-center justify-between">
           <h2 className="font-theme-heading text-lg font-semibold">
             Prerequisites ({prerequisites.length})
@@ -50,7 +50,7 @@ export function DependencyPanel({
           </Button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+        <div className="flex min-h-0 flex-col gap-2 overflow-y-auto pr-0.5 pb-2">
           <AddDependencyCard
             label="Add prerequisite"
             onClick={() => setPrereqDialogOpen(true)}
@@ -85,7 +85,7 @@ export function DependencyPanel({
           </Button>
         </div>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
+        <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-0.5 pb-2">
           <AddDependencyCard
             label="Add required for"
             onClick={() => setRequiredForDialogOpen(true)}
