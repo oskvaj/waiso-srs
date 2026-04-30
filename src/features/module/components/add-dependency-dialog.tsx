@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Dialog,
   DialogContent,
@@ -29,7 +27,7 @@ export function AddDependencyDialog({
   const { data: modules } = api.module.listForTeacher.useQuery(
     { courseId },
     { enabled: open },
-  );
+  ); // TODO: do some sort of loading or something while waiting for this
 
   const addPrerequisite = api.module.addPrerequisite.useMutation({
     onSuccess: () => {
