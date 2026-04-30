@@ -57,6 +57,7 @@ export type StudentModuleListItem = {
   name: string;
   level: number;
   nextReveiwTime: Date | null;
+  isUnlocked: boolean;
 };
 
 export async function listModulesForStudent(
@@ -99,6 +100,7 @@ export async function listModulesForStudent(
       name: m.name,
       level: m.moduleProgresses[0]?.level ?? 0,
       nextReveiwTime: m.moduleProgresses[0]?.nextReview ?? null,
+      isUnlocked: m.moduleProgresses.length > 0,
     };
   });
 }
