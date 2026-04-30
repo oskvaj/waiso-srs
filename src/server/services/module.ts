@@ -263,7 +263,7 @@ export async function addPrerequisite(
 ): Promise<{ id: string }> {
   const mod = await db.module.findUnique({
     where: { id: moduleId },
-    include: { course: { select: { teacherId: true } } },
+    include: { course: { select: { teacherId: true, id: true } } },
   });
 
   if (!mod) {
@@ -276,6 +276,17 @@ export async function addPrerequisite(
     throw new TRPCError({
       code: "BAD_REQUEST",
       message: "A module cannot depend on itself",
+    });
+  }
+
+  const modules = await getCourseModuleGraph(db, mod.course.id);
+  const { requiredForMap } = buildGraph(modules);
+  const descendants = getDescendants(moduleId, requiredForMap);
+
+  if (descendants.has(prerequisiteId)) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "Adding this would create a circular dependency",
     });
   }
 
