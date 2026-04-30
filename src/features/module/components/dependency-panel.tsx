@@ -8,6 +8,7 @@ import { useState } from "react";
 import { AddDependencyCard } from "./add-dependency-card";
 import { DependencyCard } from "./dependency-card";
 import { AddDependencyDialog } from "./add-dependency-dialog";
+import { api } from "@/trpc/react";
 
 export function DependencyPanel({
   prerequisites,
@@ -23,6 +24,14 @@ export function DependencyPanel({
   const router = useRouter();
   const [prereqDialogOpen, setPrereqDialogOpen] = useState(false);
   const [requiredForDialogOpen, setRequiredForDialogOpen] = useState(false);
+
+  const removePrerequisite = api.module.removePrerequisite.useMutation({
+    onSuccess: () => router.refresh(),
+  });
+
+  const removeRequiredFor = api.module.removeRequiredFor.useMutation({
+    onSuccess: () => router.refresh(),
+  });
 
   return (
     <div className="flex h-full w-64 shrink-0 flex-col gap-4">
@@ -50,7 +59,12 @@ export function DependencyPanel({
             <DependencyCard
               key={dep.id}
               dependency={dep}
-              onRemove={() => console.log("temp")}
+              onRemove={() =>
+                removePrerequisite.mutate({
+                  moduleId,
+                  prerequisiteId: dep.id,
+                })
+              }
             />
           ))}
         </div>
@@ -80,7 +94,12 @@ export function DependencyPanel({
             <DependencyCard
               key={dep.id}
               dependency={dep}
-              onRemove={() => console.log("temp")}
+              onRemove={() =>
+                removeRequiredFor.mutate({
+                  moduleId,
+                  targetModuleId: dep.id,
+                })
+              }
             />
           ))}
         </div>
