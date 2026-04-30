@@ -253,3 +253,63 @@ export async function listRequiredFor(
 
   return mod.requiredFor;
 }
+
+export async function addPrerequisite(
+  db: PrismaClient,
+  moduleId: string,
+  teacherId: string,
+  prerequisiteId: string,
+): Promise<{ id: string }> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: { course: { select: { teacherId: true } } },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+  if (mod.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+  if (moduleId === prerequisiteId) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "A module cannot depend on itself",
+    });
+  }
+
+  return db.module.update({
+    where: { id: moduleId },
+    data: {
+      prerequisites: { connect: { id: prerequisiteId } },
+    },
+    select: { id: true },
+  });
+}
+
+export async function removePrerequisite(
+  db: PrismaClient,
+  moduleId: string,
+  teacherId: string,
+  prerequisiteId: string,
+): Promise<{ id: string }> {
+  const mod = await db.module.findUnique({
+    where: { id: moduleId },
+    include: { course: { select: { teacherId: true } } },
+  });
+
+  if (!mod) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
+  }
+  if (mod.course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
+  }
+
+  return db.module.update({
+    where: { id: moduleId },
+    data: {
+      prerequisites: { disconnect: { id: prerequisiteId } },
+    },
+    select: { id: true },
+  });
+}

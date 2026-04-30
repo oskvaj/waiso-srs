@@ -15,6 +15,8 @@ import {
   updateModuleSchema,
   listPrerequisites,
   listRequiredFor,
+  addPrerequisite,
+  removePrerequisite,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -58,5 +60,27 @@ export const moduleRouter = createTRPCRouter({
     .input(z.object({ moduleId: z.string() }))
     .query(({ ctx, input }) => {
       return listRequiredFor(ctx.db, input.moduleId);
+    }),
+
+  addPrerequisite: teacherProcedure
+    .input(z.object({ moduleId: z.string(), prerequisiteId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return addPrerequisite(
+        ctx.db,
+        input.moduleId,
+        ctx.teacher.userId,
+        input.prerequisiteId,
+      );
+    }),
+
+  removePrerequisite: teacherProcedure
+    .input(z.object({ moduleId: z.string(), prerequisiteId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return removePrerequisite(
+        ctx.db,
+        input.moduleId,
+        ctx.teacher.userId,
+        input.prerequisiteId,
+      );
     }),
 });
