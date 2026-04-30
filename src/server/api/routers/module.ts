@@ -19,6 +19,8 @@ import {
   removePrerequisite,
   getAvailablePrerequisites,
   getAvailableRequiredFor,
+  getStudentModuleOverview,
+  setStudentHasRead,
 } from "@/server/services/module";
 
 export const moduleRouter = createTRPCRouter({
@@ -125,6 +127,28 @@ export const moduleRouter = createTRPCRouter({
         ctx.db,
         input.moduleId,
         ctx.teacher.userId,
+      );
+    }),
+
+  studentModuleOverview: studentProcedure
+    .input(z.object({ courseId: z.string(), moduleId: z.string() }))
+    .query(({ ctx, input }) => {
+      return getStudentModuleOverview(
+        ctx.db,
+        input.courseId,
+        input.moduleId,
+        ctx.student.userId,
+      );
+    }),
+
+  studentSetHasRead: studentProcedure
+    .input(z.object({ courseId: z.string(), moduleId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return setStudentHasRead(
+        ctx.db,
+        input.courseId,
+        input.moduleId,
+        ctx.student.userId,
       );
     }),
 });

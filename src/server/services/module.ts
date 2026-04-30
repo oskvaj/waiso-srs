@@ -1,6 +1,6 @@
-import type { PrismaClient } from "@/../generated/prisma";
+import { PrismaClient } from "@/../generated/prisma";
 import { calculateAvgModuleProgress } from "./progress";
-import z from "zod";
+import z, { promise } from "zod";
 import { assertCourseOwnership } from "./course";
 import { TRPCError } from "@trpc/server";
 import { buildGraph, getAncestors, getDescendants } from "./module-graph";
@@ -417,4 +417,102 @@ export async function getAvailableRequiredFor(
         !ancestors.has(m.id),
     )
     .map((m) => ({ id: m.id, name: m.name }));
+}
+
+export type StudentModuleOverview = {
+  courseName: string;
+  moduleName: string;
+  moduleLevel: number;
+  content: unknown; //tiptap JSON content
+  hasRead: boolean;
+};
+
+export async function getStudentModuleOverview(
+  db: PrismaClient,
+  courseId: string,
+  moduleId: string,
+  studentId: string,
+): Promise<StudentModuleOverview> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  const moduleData = await db.moduleProgress.findUnique({
+    where: {
+      studentId_courseId_moduleId: {
+        studentId: studentId,
+        courseId: courseId,
+        moduleId: moduleId,
+      },
+    },
+    select: {
+      enrollment: { select: { course: { select: { name: true } } } },
+      level: true,
+      module: { select: { content: true, name: true } },
+      hasReadTheory: true,
+    },
+  });
+
+  if (!moduleData) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "No ModuleProgress for this module",
+    });
+  }
+
+  return {
+    courseName: moduleData.enrollment.course.name,
+    moduleName: moduleData.module.name,
+    moduleLevel: moduleData.level,
+    content: moduleData.module.content,
+    hasRead: moduleData.hasReadTheory,
+  };
+}
+
+export async function setStudentHasRead(
+  db: PrismaClient,
+  courseId: string,
+  moduleId: string,
+  studentId: string,
+) {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  await db.moduleProgress.update({
+    where: {
+      studentId_courseId_moduleId: {
+        studentId: studentId,
+        courseId: courseId,
+        moduleId: moduleId,
+      },
+    },
+    data: {
+      hasReadTheory: true,
+    },
+  });
 }
