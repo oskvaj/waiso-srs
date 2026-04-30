@@ -520,7 +520,7 @@ export async function getStudentReviewSchedule(
 }
 
 export type ModulesWithoutTheoryLearnt = {
-  missingTheory: number;
+  missingTheoryCount: number;
 };
 
 export async function numberOfCoursesWithoutTheoryRead(
@@ -545,8 +545,75 @@ export async function numberOfCoursesWithoutTheoryRead(
   }
 
   return {
-    missingTheory: await db.moduleProgress.count({
+    missingTheoryCount: await db.moduleProgress.count({
       where: { studentId, courseId, hasReadTheory: false },
     }),
+  };
+}
+
+export type contentNeededToBeLearn = {
+  courseName: string;
+  contentList: {
+    content: unknown;
+  }[];
+};
+
+export async function getUnlearntContent(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+): Promise<contentNeededToBeLearn> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  const moduleIds = await db.moduleProgress.findMany({
+    where: { studentId, courseId, hasReadTheory: false },
+    select: {
+      moduleId: true,
+    },
+  });
+
+  if (moduleIds.length == 0) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "There are no modules which need to be learnt",
+    });
+  }
+
+  const modules = await Promise.all(
+    moduleIds.map(async (m) => {
+      try {
+        return await db.module.findUniqueOrThrow({
+          where: { id: m.moduleId },
+          select: {
+            course: { select: { name: true } },
+            content: true,
+          },
+        });
+      } catch (e) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: `Module ${m.moduleId} not found`,
+        });
+      }
+    }),
+  );
+
+  return {
+    courseName: modules[0]!.course.name,
+    contentList: modules.map((m) => ({ content: m.content })),
   };
 }
