@@ -11,6 +11,7 @@ import {
   getStudentCourseOverview,
   reviewsDueNow,
   getStudentReviewSchedule,
+  numberOfCoursesWithoutTheoryRead,
 } from "@/server/services/course";
 import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
 import z from "zod";
@@ -70,6 +71,16 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ courseId: z.string() }))
     .query(({ ctx, input }) => {
       return getStudentReviewSchedule(
+        ctx.db,
+        input.courseId,
+        ctx.student.userId,
+      );
+    }),
+
+  getMissingTheoryNumber: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .query(({ ctx, input }) => {
+      return numberOfCoursesWithoutTheoryRead(
         ctx.db,
         input.courseId,
         ctx.student.userId,

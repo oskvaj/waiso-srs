@@ -518,3 +518,35 @@ export async function getStudentReviewSchedule(
 
   return { moduleTimes };
 }
+
+export type ModulesWithoutTheoryLearnt = {
+  missingTheory: number;
+};
+
+export async function numberOfCoursesWithoutTheoryRead(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+): Promise<ModulesWithoutTheoryLearnt> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  return {
+    missingTheory: await db.moduleProgress.count({
+      where: { studentId, courseId, hasReadTheory: false },
+    }),
+  };
+}
