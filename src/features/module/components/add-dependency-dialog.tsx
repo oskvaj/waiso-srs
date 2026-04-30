@@ -11,23 +11,27 @@ export function AddDependencyDialog({
   open,
   onOpenChange,
   moduleId,
-  courseId,
-  existingIds,
   mode,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   moduleId: string;
-  courseId: string;
-  existingIds: string[];
   mode: "prerequisite" | "requiredFor";
 }) {
   const router = useRouter();
 
-  const { data: modules } = api.module.listForTeacher.useQuery(
-    { courseId },
-    { enabled: open },
-  ); // TODO: do some sort of loading or something while waiting for this
+  const {
+    data: availableModules,
+  } = // TODO: add some loading thing while waiting for this api call.
+    mode === "prerequisite"
+      ? api.module.availablePrerequisites.useQuery(
+          { moduleId },
+          { enabled: open },
+        )
+      : api.module.availableRequiredFor.useQuery(
+          { moduleId },
+          { enabled: open },
+        );
 
   const addPrerequisite = api.module.addPrerequisite.useMutation({
     onSuccess: () => {
@@ -52,10 +56,6 @@ export function AddDependencyDialog({
   }
 
   const isPending = addPrerequisite.isPending || addRequiredFor.isPending;
-
-  const availableModules = modules?.filter(
-    (m) => m.id !== moduleId && !existingIds.includes(m.id),
-  ); // TODO: add an endpoint for a better calculation of this
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

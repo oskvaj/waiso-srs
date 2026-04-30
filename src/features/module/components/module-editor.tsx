@@ -125,7 +125,6 @@ export function ModuleEditor({
           prerequisites={prerequisites}
           requiredFor={requiredFor}
           moduleId={module.id}
-          courseId={module.courseId}
         />
       </div>
     </div>

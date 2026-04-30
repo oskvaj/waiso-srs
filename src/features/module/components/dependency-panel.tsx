@@ -14,12 +14,10 @@ export function DependencyPanel({
   prerequisites,
   requiredFor,
   moduleId,
-  courseId,
 }: {
   prerequisites: DependencyListItem[];
   requiredFor: DependencyListItem[];
   moduleId: string;
-  courseId: string;
 }) {
   const router = useRouter();
   const [prereqDialogOpen, setPrereqDialogOpen] = useState(false);
@@ -109,16 +107,12 @@ export function DependencyPanel({
         open={prereqDialogOpen}
         onOpenChange={setPrereqDialogOpen}
         moduleId={moduleId}
-        courseId={courseId}
-        existingIds={prerequisites.map((d) => d.id)}
         mode="prerequisite"
       />
       <AddDependencyDialog
         open={requiredForDialogOpen}
         onOpenChange={setRequiredForDialogOpen}
         moduleId={moduleId}
-        courseId={courseId}
-        existingIds={requiredFor.map((d) => d.id)}
         mode="requiredFor"
       />
     </div>
