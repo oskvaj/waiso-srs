@@ -3,7 +3,11 @@ import { calculateAvgModuleProgress } from "./progress";
 import z, { promise } from "zod";
 import { assertCourseOwnership } from "./course";
 import { TRPCError } from "@trpc/server";
-import { buildGraph, getAncestors, getDescendants } from "./module-graph";
+import {
+  buildGraph,
+  getAncestors,
+  getDescendants,
+} from "../../lib/module-graph";
 
 export type ModuleListItem = {
   id: string;
