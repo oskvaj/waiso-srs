@@ -7,6 +7,7 @@ import { ModuleCard } from "./module-card";
 import { useState } from "react";
 import { AddModuleCard } from "./add-module-card";
 import { AddModuleDialog } from "./add-module-dialog";
+import Link from "next/link";
 
 const VISIBLE_COUNT = 12;
 
@@ -31,9 +32,11 @@ export function ModulesSection({
           Modules ({modules.length})
         </h2>
         <div className="space-x-4">
-          <Button variant="secondary" className="items-center">
-            Dependency graph
-          </Button>
+          <Link href={`/courses/${courseId}/graph`}>
+            <Button variant="secondary" className="items-center">
+              Dependency graph
+            </Button>
+          </Link>
           <AddModuleDialog courseId={courseId}>
             <Button
               variant="action"
