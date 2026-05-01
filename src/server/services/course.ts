@@ -617,3 +617,42 @@ export async function getUnlearntContent(
     contentList: modules.map((m) => ({ content: m.content })),
   };
 }
+
+export type ModuleGraphNode = {
+  id: string;
+  name: string;
+  prerequisiteIds: string[];
+};
+
+export async function getModuleGraph(
+  db: PrismaClient,
+  courseId: string,
+  teacherId: string,
+): Promise<ModuleGraphNode[]> {
+  const course = await db.course.findUnique({
+    where: { id: courseId },
+    select: { teacherId: true },
+  });
+
+  if (!course) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Course not found" });
+  }
+  if (course.teacherId !== teacherId) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Not your course" });
+  }
+
+  const modules = await db.module.findMany({
+    where: { courseId },
+    select: {
+      id: true,
+      name: true,
+      prerequisites: { select: { id: true } },
+    },
+  });
+
+  return modules.map((m) => ({
+    id: m.id,
+    name: m.name,
+    prerequisiteIds: m.prerequisites.map((p) => p.id),
+  }));
+}
