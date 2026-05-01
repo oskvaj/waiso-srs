@@ -9,33 +9,39 @@ export function StudentReviewButton({ courseIds }: { courseIds: string[] }) {
     courseIds,
   });
 
-  return (
-    <Link href={`/reviews?courses=${courseIds.join(",")}`}>
-      <Card
-        variant="raised"
-        className={`group h-full p-6 transition-colors ${
-          reviewsDue && reviewsDue.totalForAllCoursesSent > 0
-            ? "bg-theme-action/25 hover:bg-theme-action/35 text-theme-action"
-            : "text-theme-text"
-        }`}
-      >
-        <div className="flex items-baseline justify-between">
-          <span className="font-theme-heading text-xl font-semibold">
-            Reviews
-          </span>
-          <span className="font-theme-heading text-xl">
-            {reviewsDue ? (
-              reviewsDue.totalForAllCoursesSent > 0 ? (
-                <div>{reviewsDue.totalForAllCoursesSent}</div>
-              ) : (
-                "None, good job!"
-              )
+  const hasReviews = reviewsDue && reviewsDue.totalForAllCoursesSent > 0;
+
+  const card = (
+    <Card
+      variant="raised"
+      className={`group h-full p-6 transition-colors ${
+        hasReviews
+          ? "bg-theme-action/25 hover:bg-theme-action/35 text-theme-action"
+          : "text-theme-text"
+      }`}
+    >
+      <div className="flex items-baseline justify-between">
+        <span className="font-theme-heading text-xl font-semibold">
+          Reviews
+        </span>
+        <span className="font-theme-heading text-xl">
+          {reviewsDue ? (
+            hasReviews ? (
+              <div>{reviewsDue.totalForAllCoursesSent}</div>
             ) : (
-              "Loading"
-            )}
-          </span>
-        </div>
-      </Card>
-    </Link>
+              "None, good job!"
+            )
+          ) : (
+            "Loading"
+          )}
+        </span>
+      </div>
+    </Card>
+  );
+
+  return hasReviews ? (
+    <Link href={`/review?courses=${courseIds.join(",")}`}>{card}</Link>
+  ) : (
+    card
   );
 }
