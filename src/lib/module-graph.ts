@@ -60,3 +60,95 @@ export function getAncestors(
 ): Set<string> {
   return getReachable(moduleId, prerequisiteMap);
 }
+
+export type LayoutNode = {
+  id: string;
+  name: string;
+  x: number;
+  y: number;
+};
+
+export type LayoutEdge = {
+  sourceId: string;
+  targetId: string;
+};
+
+export function layoutGraph(modules: ModuleNode[]): {
+  nodes: LayoutNode[];
+  edges: LayoutEdge[];
+} {
+  if (modules.length === 0) return { nodes: [], edges: [] };
+
+  const { prerequisiteMap } = buildGraph(modules);
+  const nameMap = new Map(modules.map((m) => [m.id, m.name]));
+
+  const rank = new Map<string, number>();
+
+  function computeRank(id: string, visited: Set<string>): number {
+    if (rank.has(id)) return rank.get(id)!;
+    if (visited.has(id)) return 0;
+    visited.add(id);
+
+    const prereqs = prerequisiteMap.get(id) ?? [];
+    const maxPrereqRank =
+      prereqs.length === 0
+        ? 0
+        : Math.max(...prereqs.map((p) => computeRank(p, visited) + 1));
+
+    rank.set(id, maxPrereqRank);
+    return maxPrereqRank;
+  }
+
+  for (const m of modules) {
+    computeRank(m.id, new Set());
+  }
+
+  const rankGroups = new Map<number, string[]>();
+  for (const m of modules) {
+    const r = rank.get(m.id) ?? 0;
+    const group = rankGroups.get(r) ?? [];
+
+    group.push(m.id);
+    rankGroups.set(r, group);
+  }
+
+  for (const group of rankGroups.values()) {
+    group.sort((a, b) =>
+      (nameMap.get(a) ?? "").localeCompare(nameMap.get(b) ?? ""),
+    );
+  }
+
+  const NODE_WIDTH = 200;
+  const NODE_HEIGHT = 50;
+  const X_GAP = 30;
+  const Y_GAP = 100;
+
+  const nodes: LayoutNode[] = [];
+
+  const maxRank = Math.max(...rankGroups.keys());
+
+  for (let r = 0; r <= maxRank; r++) {
+    const group = rankGroups.get(r) ?? [];
+    const totalWidth = group.length * NODE_WIDTH + (group.length - 1) * X_GAP;
+    const startX = -totalWidth / 2;
+
+    for (let i = 0; i < group.length; i++) {
+      const id = group[i]!;
+      nodes.push({
+        id,
+        name: nameMap.get(id) ?? "",
+        x: startX + i * (NODE_WIDTH + X_GAP),
+        y: r * (NODE_HEIGHT + Y_GAP),
+      });
+    }
+  }
+
+  const edges: LayoutEdge[] = [];
+  for (const m of modules) {
+    for (const prereqId of m.prerequisiteIds) {
+      edges.push({ sourceId: prereqId, targetId: m.id });
+    }
+  }
+
+  return { nodes, edges };
+}
