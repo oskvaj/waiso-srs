@@ -430,25 +430,16 @@ export async function reviewsDueNow(
   courseIds: string[],
   studentId: string,
 ): Promise<StudentReviewsNeeded> {
-  await Promise.all(
-    courseIds.map(async (courseId) => {
-      try {
-        await db.studentInCourse.findUniqueOrThrow({
-          where: {
-            studentId_courseId: {
-              studentId: studentId,
-              courseId: courseId,
-            },
-          },
-        });
-      } catch (e) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Student not in course",
-        });
-      }
-    }),
-  );
+  const enrolledCount = await db.studentInCourse.count({
+    where: { studentId, courseId: { in: courseIds } },
+  });
+
+  if (enrolledCount !== courseIds.length) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not enrolled in all requested courses",
+    });
+  }
 
   const courses = await Promise.all(
     courseIds.map((courseId) =>
