@@ -621,10 +621,13 @@ export async function getModuleGraph(
   db: PrismaClient,
   courseId: string,
   teacherId: string,
-): Promise<ModuleGraphNode[]> {
+): Promise<{
+  modules: ModuleGraphNode[];
+  courseName: string;
+}> {
   const course = await db.course.findUnique({
     where: { id: courseId },
-    select: { teacherId: true },
+    select: { teacherId: true, name: true },
   });
 
   if (!course) {
@@ -643,9 +646,12 @@ export async function getModuleGraph(
     },
   });
 
-  return modules.map((m) => ({
-    id: m.id,
-    name: m.name,
-    prerequisiteIds: m.prerequisites.map((p) => p.id),
-  }));
+  return {
+    modules: modules.map((m) => ({
+      id: m.id,
+      name: m.name,
+      prerequisiteIds: m.prerequisites.map((p) => p.id),
+    })),
+    courseName: course.name,
+  };
 }
