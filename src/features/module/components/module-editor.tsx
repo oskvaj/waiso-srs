@@ -105,7 +105,7 @@ export function ModuleEditor({
               </Button>
             )}
           </div>
-          <div className="border-theme-border bg-theme-card min-h-0 flex-1 rounded-lg border">
+          <div className="border-theme-border bg-theme-card min-h-0 flex-1 overflow-y-auto rounded-lg border">
             <TipTapEditor
               key={editing ? "edit" : "view"}
               content={content!}
