@@ -78,29 +78,14 @@ export function PairEditor({
         return (
           <div
             key={pair.key}
-            className="border-theme-border bg-theme-card rounded-lg border p-3"
+            className="flex flex-row items-start justify-start"
           >
-            <div className="mb-2 flex items-center justify-between">
-              {editing && (
-                <button
-                  type="button"
-                  onClick={() => removePair(pair.key)}
-                  className="text-theme-danger hover:text-theme-danger/80 p-1"
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
-              )}
-            </div>
-
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="text-theme-muted mb-1 block text-xs">
-                  Left
-                </span>
                 <div
                   className={`rounded-lg border ${
                     leftError ? "border-theme-danger" : "border-theme-border"
-                  }`}
+                  } ${editing ? "bg-theme-card" : ""}`}
                 >
                   <TipTapEditor
                     key={editing ? `edit-l-${pair.key}` : `view-l-${pair.key}`}
@@ -111,13 +96,10 @@ export function PairEditor({
                 </div>
               </div>
               <div>
-                <span className="text-theme-muted mb-1 block text-xs">
-                  Right
-                </span>
                 <div
                   className={`rounded-lg border ${
                     rightError ? "border-theme-danger" : "border-theme-border"
-                  }`}
+                  } ${editing ? "bg-theme-card" : ""}`}
                 >
                   <TipTapEditor
                     key={editing ? `edit-r-${pair.key}` : `view-r-${pair.key}`}
@@ -127,6 +109,17 @@ export function PairEditor({
                   />
                 </div>
               </div>
+            </div>
+            <div className="flex items-center justify-between p-2">
+              {editing && (
+                <button
+                  type="button"
+                  onClick={() => removePair(pair.key)}
+                  className="text-theme-danger hover:text-theme-danger/80 p-1 hover:cursor-pointer"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              )}
             </div>
           </div>
         );
