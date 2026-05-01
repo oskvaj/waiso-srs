@@ -206,7 +206,9 @@ export function QuestionEditor({
             <h2 className="font-theme-heading mb-2 text-sm font-semibold">
               Question
             </h2>
-            <div className="border-theme-border bg-theme-card min-h-30 rounded-lg border">
+            <div
+              className={`border-theme-border min-h-30 rounded-lg border ${editing ? "bg-theme-card" : ""}`}
+            >
               <TipTapEditor
                 key={editing ? "edit-q" : "view-q"}
                 content={content.question}
@@ -302,7 +304,9 @@ export function QuestionEditor({
               Explanation{" "}
               <span className="text-theme-muted font-normal">(optional)</span>
             </h2>
-            <div className="border-theme-border bg-theme-card min-h-14 rounded-lg border">
+            <div
+              className={`border-theme-border min-h-14 rounded-lg border ${editing ? "bg-theme-card" : ""}`}
+            >
               <TipTapEditor
                 key={editing ? "edit-e" : "view-e"}
                 content={content.explanation ?? { type: "doc", content: [] }}
