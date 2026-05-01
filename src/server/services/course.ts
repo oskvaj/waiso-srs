@@ -554,6 +554,7 @@ export async function numberOfCoursesWithoutTheoryRead(
 export type contentNeededToBeLearn = {
   courseName: string;
   contentList: {
+    moduleId: string;
     content: unknown;
   }[];
 };
@@ -600,6 +601,7 @@ export async function getUnlearntContent(
           where: { id: m.moduleId },
           select: {
             course: { select: { name: true } },
+            id: true,
             content: true,
           },
         });
@@ -614,7 +616,7 @@ export async function getUnlearntContent(
 
   return {
     courseName: modules[0]!.course.name,
-    contentList: modules.map((m) => ({ content: m.content })),
+    contentList: modules.map((m) => ({ content: m.content, moduleId: m.id })),
   };
 }
 
