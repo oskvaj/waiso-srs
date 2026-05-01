@@ -62,6 +62,7 @@ export type StudentModuleListItem = {
   level: number;
   nextReveiwTime: Date | null;
   isUnlocked: boolean;
+  hasReadTheory: boolean;
 };
 
 export async function listModulesForStudent(
@@ -93,7 +94,7 @@ export async function listModulesForStudent(
       name: true,
       moduleProgresses: {
         where: { studentId: studentId },
-        select: { level: true, nextReview: true },
+        select: { level: true, nextReview: true, hasReadTheory: true },
       },
     },
   });
@@ -105,6 +106,7 @@ export async function listModulesForStudent(
       level: m.moduleProgresses[0]?.level ?? 0,
       nextReveiwTime: m.moduleProgresses[0]?.nextReview ?? null,
       isUnlocked: m.moduleProgresses.length > 0,
+      hasReadTheory: m.moduleProgresses[0]?.hasReadTheory ?? false,
     };
   });
 }

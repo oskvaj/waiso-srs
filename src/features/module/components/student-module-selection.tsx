@@ -16,7 +16,18 @@ export function StudentModulesSection({
   const [expanded, setExpanded] = useState(false);
 
   const hasMore = modules.length > VISIBLE_COUNT;
-  const visibleModules = expanded ? modules : modules.slice(0, VISIBLE_COUNT);
+
+  const sortedModules = [...modules].sort((a, b) => {
+    if (a.isUnlocked && !a.hasReadTheory && !(b.isUnlocked && !b.hasReadTheory))
+      return -1;
+    if (b.isUnlocked && !b.hasReadTheory && !(a.isUnlocked && !a.hasReadTheory))
+      return 1;
+    return 0;
+  });
+
+  const visibleModules = expanded
+    ? sortedModules
+    : sortedModules.slice(0, VISIBLE_COUNT);
 
   return (
     <div className="space-y-4">
