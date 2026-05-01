@@ -74,18 +74,14 @@ export function MultipleChoiceEditor({
       {entries.map((answer) => (
         <div
           key={answer.key}
-          className={`rounded-lg border p-3 ${
-            answer.correct
-              ? "border-theme-success/50 bg-theme-success/5"
-              : errors.some(
-                    (e) => e.field === `answer-${entries.indexOf(answer)}`,
-                  )
-                ? "border-theme-danger bg-theme-danger/5"
-                : "border-theme-border bg-theme-card"
+          className={`flex ${
+            errors.some((e) => e.field === `answer-${entries.indexOf(answer)}`)
+              ? "border-theme-danger bg-theme-danger/5"
+              : ""
           }`}
         >
           {editing && (
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2 flex min-w-35 items-center">
               <button
                 type="button"
                 onClick={() => editing && toggleCorrect(answer.key)}
@@ -113,18 +109,12 @@ export function MultipleChoiceEditor({
                   {answer.correct ? "Correct" : "Mark as correct"}
                 </span>
               </button>
-
-              <button
-                type="button"
-                onClick={() => removeAnswer(answer.key)}
-                className="text-theme-danger hover:text-theme-danger/80 p-1 hover:cursor-pointer"
-              >
-                <Trash2 className="size-3.5" />
-              </button>
             </div>
           )}
 
-          <div className="border-theme-border rounded-lg border">
+          <div
+            className={`border-theme-border flex-1 rounded-lg border ${answer.correct ? "bg-theme-success/5 border-theme-success/50" : ""}`}
+          >
             <TipTapEditor
               key={editing ? `edit-${answer.key}` : `view-${answer.key}`}
               content={answer.text}
@@ -132,6 +122,16 @@ export function MultipleChoiceEditor({
               editable={editing}
             />
           </div>
+
+          {editing && (
+            <button
+              type="button"
+              onClick={() => removeAnswer(answer.key)}
+              className="text-theme-danger hover:text-theme-danger/80 p-2 hover:cursor-pointer"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          )}
         </div>
       ))}
 
