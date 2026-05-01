@@ -79,7 +79,7 @@ export function FreeTextEditor({
               placeholder="Accepted answer..."
               disabled={!editing}
               autoComplete="off"
-              className={`min-h-10 flex-1 ${editing ? "bg-theme-card" : ""}`}
+              className={`disabled:bg-theme-page flex-1 py-6 disabled:opacity-100 ${editing ? "bg-theme-card" : ""}`}
             />
 
             <button
