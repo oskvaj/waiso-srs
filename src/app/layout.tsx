@@ -6,8 +6,9 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { fonts, getThemeVars, type ThemeMode, type ThemeName } from "./theme";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import { Toaster } from "sonner";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 const THEME: ThemeName = "honeybee";
 const MODE: ThemeMode = "light";
@@ -30,6 +31,7 @@ export default function RootLayout({
         style={themeVars as React.CSSProperties}
       >
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );
