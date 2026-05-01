@@ -69,10 +69,8 @@ export function FreeTextEditor({
         return (
           <div
             key={answer.key}
-            className={`flex items-center gap-4 rounded-lg border p-3 ${
-              hasError
-                ? "border-theme-danger bg-theme-danger/5"
-                : "border-theme-border bg-theme-card"
+            className={`flex items-center gap-4 ${
+              hasError ? "bg-theme-danger/5" : ""
             }`}
           >
             <Input
@@ -80,8 +78,8 @@ export function FreeTextEditor({
               onChange={(e) => updateText(answer.key, e.target.value)}
               placeholder="Accepted answer..."
               disabled={!editing}
-              className="flex-1"
               autoComplete="off"
+              className={`min-h-10 flex-1 ${editing ? "bg-theme-card" : ""}`}
             />
 
             <button
