@@ -70,7 +70,13 @@ function shuffle<T>(arr: T[]): T[] {
 
 function Viewer({ content }: { content: JSONContent }) {
   return (
-    <TipTapEditor content={content} onUpdate={() => {}} editable={false} />
+    <TipTapEditor
+      content={content}
+      onUpdate={() => {
+        return;
+      }}
+      editable={false}
+    />
   );
 }
 

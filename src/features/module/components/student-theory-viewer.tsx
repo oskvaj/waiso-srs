@@ -56,7 +56,9 @@ export function TheoryViewer({
             <TipTapEditor
               key={index}
               content={contentList[index]!.content as JSONContent}
-              onUpdate={() => {}}
+              onUpdate={() => {
+                return;
+              }}
               editable={false}
             />
           </div>

@@ -132,7 +132,7 @@ export async function createQuestion(
     data: {
       name,
       type: input.type,
-      content: validated as unknown as object,
+      content: validated,
       moduleId: input.moduleId,
     },
     select: { id: true },
@@ -188,7 +188,7 @@ export async function updateQuestion(
     data: {
       name,
       type: input.type,
-      content: validated as unknown as object,
+      content: validated,
     },
     select: { id: true },
   });

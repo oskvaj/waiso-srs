@@ -8,10 +8,8 @@ export default async function ReviewSchedulePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let unlearntContent;
-  [unlearntContent] = await Promise.all([
-    api.course.getMissingTheory({ courseId: id }),
-  ]);
+
+  const unlearntContent = await api.course.getMissingTheory({ courseId: id });
 
   return (
     <div className="-mx-3 -mt-10 -mb-30 h-screen overflow-hidden px-3 pt-10">

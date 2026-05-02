@@ -12,8 +12,7 @@ export default async function CourseOverviewPage({
 }) {
   const { id } = await params;
 
-  let course, modules, missingTheory;
-  [course, modules, missingTheory] = await Promise.all([
+  const [course, modules, missingTheory] = await Promise.all([
     api.course.getStudentOverview({ id: id }),
     api.module.listForStudent({ courseId: id }),
     api.course.getMissingTheoryNumber({ courseId: id }),

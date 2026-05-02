@@ -65,13 +65,11 @@ export function validateQuestionContent(
 ): QuestionContent {
   switch (type) {
     case "MULTIPLE_CHOICE":
-      return multipleChoiceContentSchema.parse(
-        content,
-      ) as MultipleChoiceContent;
+      return multipleChoiceContentSchema.parse(content);
     case "FREE_TEXT":
-      return freeTextContentSchema.parse(content) as FreeTextContent;
+      return freeTextContentSchema.parse(content);
     case "PAIR":
-      return pairContentSchema.parse(content) as PairContent;
+      return pairContentSchema.parse(content);
     default:
       throw new Error(`Unknown question type: ${type}`);
   }

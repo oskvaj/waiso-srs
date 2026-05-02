@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: "Waiso",
   description: "Spaced repetition learning platform",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({
@@ -28,7 +29,7 @@ export default function RootLayout({
     <html lang="en" className={cn(fonts.classes, "font-sans", geist.variable)}>
       <body
         className="font-theme-body bg-theme-page text-theme-text antialiased"
-        style={themeVars as React.CSSProperties}
+        style={themeVars}
       >
         <TRPCReactProvider>{children}</TRPCReactProvider>
         <Toaster />

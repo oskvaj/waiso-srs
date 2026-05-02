@@ -7,7 +7,9 @@ export function ContentViewer({ content }: { content: unknown }) {
   return (
     <TipTapEditor
       content={content as JSONContent}
-      onUpdate={() => {}}
+      onUpdate={() => {
+        return;
+      }}
       editable={false}
     />
   );
