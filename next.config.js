@@ -3,12 +3,12 @@
  * for Docker builds.
  */
 import "./src/env.js";
-import withPWA from "next-pwa";
+import withPWA from "@ducanh2912/next-pwa";
 
 const pwaConfig = withPWA({
   dest: "public",
   register: true,
-  skipWaiting: true,
+  disable: false,
 });
 
 /** @type {import("next").NextConfig} */
