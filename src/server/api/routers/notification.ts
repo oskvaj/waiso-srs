@@ -1,8 +1,12 @@
 import z from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { subscribe, unsubscribe } from "@/server/services/push-subscription";
+import {
+  sendPushNotification,
+  subscribe,
+  unsubscribe,
+} from "@/server/services/notification";
 
-export const pushSubscriptionRouter = createTRPCRouter({
+export const notificationRouter = createTRPCRouter({
   subscribe: protectedProcedure
     .input(
       z.object({
@@ -26,4 +30,12 @@ export const pushSubscriptionRouter = createTRPCRouter({
     .mutation(({ ctx, input }) => {
       return unsubscribe(ctx.db, input.endpoint, ctx.session.user.id);
     }),
+
+  testPush: protectedProcedure.mutation(async ({ ctx }) => {
+    await sendPushNotification(ctx.db, ctx.session.user.id, {
+      title: "Test push",
+      body: "Push notifications are working!",
+      url: "/course",
+    });
+  }),
 });
