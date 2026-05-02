@@ -129,6 +129,20 @@ model ModuleProgress {
     @@index([studentId, nextReview])
 }
 
+model PushSubscription {
+    id       String @id @default(cuid())
+    userId   String
+    endpoint String @unique
+    p256dh   String
+    auth     String
+
+    createdAt DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
+}
+
 // Necessary for Next auth
 model Account {
     id                       String  @id @default(cuid())
@@ -164,10 +178,13 @@ model User {
     emailVerified DateTime?
     createdAt     DateTime  @default(now())
     image         String?
-    accounts      Account[]
-    sessions      Session[]
-    teacher       Teacher?
-    student       Student?
+
+    accounts Account[]
+    sessions Session[]
+
+    teacher           Teacher?
+    student           Student?
+    pushSubscriptions PushSubscription[]
 }
 
 model VerificationToken {
