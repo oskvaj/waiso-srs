@@ -23,6 +23,8 @@ export const env = createEnv({
     EMAIL_FROM: z.string().email(),
 
     UPLOADTHING_TOKEN: z.string(),
+    VAPID_PUBLIC_KEY: z.string(),
+    VAPID_PRIVATE_KEY: z.string(),
   },
 
   /**
@@ -32,6 +34,7 @@ export const env = createEnv({
    */
   client: {
     // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY_: z.string(),
   },
 
   /**
@@ -50,6 +53,10 @@ export const env = createEnv({
     EMAIL_FROM: process.env.EMAIL_FROM,
 
     UPLOADTHING_TOKEN: process.env.UPLOADTHING_TOKEN,
+
+    VAPID_PUBLIC_KEY: process.env.VAPID_PUBLIC_KEY,
+    VAPID_PRIVATE_KEY: process.env.VAPID_PRIVATE_KEY,
+    NEXT_PUBLIC_VAPID_PUBLIC_KEY_: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
