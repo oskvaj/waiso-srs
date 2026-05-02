@@ -1,7 +1,9 @@
-"use clinet";
+"use client";
 
 import { CircleUserRound, MoveLeft } from "lucide-react";
 import Link from "next/link";
+import { NotificationToggle } from "./notification-toggle";
+import { TestPushButton } from "./test-push-button";
 
 export function StudentHeader({
   href,
@@ -24,7 +26,8 @@ export function StudentHeader({
             {text}
           </div>
         </Link>
-
+        <NotificationToggle />
+        <TestPushButton />
         <div className="text-theme-muted flex items-center gap-4 text-sm">
           <button type="button" className="hover:cursor-pointer">
             <CircleUserRound className="text-theme-primary hover:text-theme-primary/70 size-8" />
