@@ -14,6 +14,8 @@ import {
   numberOfCoursesWithoutTheoryRead,
   getUnlearntContent,
   getModuleGraph,
+  joinCourse,
+  listPublishedCourses,
 } from "@/server/services/course";
 import { createTRPCRouter, studentProcedure, teacherProcedure } from "../trpc";
 import z from "zod";
@@ -99,5 +101,15 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ courseId: z.string() }))
     .query(({ ctx, input }) => {
       return getModuleGraph(ctx.db, input.courseId, ctx.teacher.userId);
+    }),
+
+  listAvailable: studentProcedure.query(({ ctx }) => {
+    return listPublishedCourses(ctx.db, ctx.student.userId);
+  }),
+
+  join: studentProcedure
+    .input(z.object({ courseId: z.string() }))
+    .mutation(({ ctx, input }) => {
+      return joinCourse(ctx.db, input.courseId, ctx.student.userId);
     }),
 });

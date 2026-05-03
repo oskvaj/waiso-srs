@@ -655,3 +655,78 @@ export async function getModuleGraph(
     courseName: course.name,
   };
 }
+
+export type PublicCourseListItem = {
+  id: string;
+  name: string;
+  description: string | null;
+};
+
+export async function listPublishedCourses(
+  db: PrismaClient,
+  studentId: string,
+): Promise<PublicCourseListItem[]> {
+  const enrolled = await db.studentInCourse.findMany({
+    where: { studentId },
+    select: { courseId: true },
+  });
+  const enrolledIds = enrolled.map((e) => e.courseId);
+
+  return db.course.findMany({
+    where: {
+      published: true,
+      id: { notIn: enrolledIds },
+    },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+    },
+  });
+}
+
+export async function joinCourse(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+) {
+  const course = await db.course.findUnique({
+    where: { id: courseId, published: true },
+    select: { id: true, modules: { select: { id: true } } },
+  });
+
+  if (!course) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Course not found",
+    });
+  }
+
+  const existing = await db.studentInCourse.findUnique({
+    where: {
+      studentId_courseId: { studentId, courseId },
+    },
+  });
+
+  if (existing) {
+    throw new TRPCError({
+      code: "CONFLICT",
+      message: "Already enrolled in this course",
+    });
+  }
+
+  await db.studentInCourse.create({
+    data: { studentId, courseId },
+  });
+
+  if (course.modules.length > 0) {
+    await db.moduleProgress.createMany({
+      data: course.modules.map((m) => ({
+        studentId,
+        courseId,
+        moduleId: m.id,
+      })),
+    });
+  }
+}
