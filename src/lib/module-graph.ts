@@ -73,6 +73,34 @@ export type LayoutEdge = {
   targetId: string;
 };
 
+function computeRanks(
+  modules: ModuleNode[],
+  prerequisiteMap: Map<string, string[]>,
+): Map<string, number> {
+  const ranks = new Map<string, number>();
+
+  function computeRank(id: string, visited: Set<string>): number {
+    if (ranks.has(id)) return ranks.get(id)!;
+    if (visited.has(id)) return 0;
+    visited.add(id);
+
+    const prereqs = prerequisiteMap.get(id) ?? [];
+    const rank =
+      prereqs.length === 0
+        ? 0
+        : Math.max(...prereqs.map((p) => computeRank(p, visited) + 1));
+
+    ranks.set(id, rank);
+    return rank;
+  }
+
+  for (const m of modules) {
+    computeRank(m.id, new Set());
+  }
+
+  return ranks;
+}
+
 export function layoutGraph(modules: ModuleNode[]): {
   nodes: LayoutNode[];
   edges: LayoutEdge[];
@@ -82,26 +110,7 @@ export function layoutGraph(modules: ModuleNode[]): {
   const { prerequisiteMap } = buildGraph(modules);
   const nameMap = new Map(modules.map((m) => [m.id, m.name]));
 
-  const rank = new Map<string, number>();
-
-  function computeRank(id: string, visited: Set<string>): number {
-    if (rank.has(id)) return rank.get(id)!;
-    if (visited.has(id)) return 0;
-    visited.add(id);
-
-    const prereqs = prerequisiteMap.get(id) ?? [];
-    const maxPrereqRank =
-      prereqs.length === 0
-        ? 0
-        : Math.max(...prereqs.map((p) => computeRank(p, visited) + 1));
-
-    rank.set(id, maxPrereqRank);
-    return maxPrereqRank;
-  }
-
-  for (const m of modules) {
-    computeRank(m.id, new Set());
-  }
+  const rank = computeRanks(modules, prerequisiteMap);
 
   const rankGroups = new Map<number, string[]>();
   for (const m of modules) {
@@ -151,4 +160,11 @@ export function layoutGraph(modules: ModuleNode[]): {
   }
 
   return { nodes, edges };
+}
+
+export function computeModuleLevels(
+  modules: ModuleNode[],
+): Map<string, number> {
+  const { prerequisiteMap } = buildGraph(modules);
+  return computeRanks(modules, prerequisiteMap);
 }
