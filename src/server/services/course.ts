@@ -685,7 +685,6 @@ export async function listPublishedCourses(
     },
   });
 }
-
 export async function joinCourse(
   db: PrismaClient,
   courseId: string,
@@ -693,7 +692,12 @@ export async function joinCourse(
 ) {
   const course = await db.course.findUnique({
     where: { id: courseId, published: true },
-    select: { id: true, modules: { select: { id: true } } },
+    select: {
+      id: true,
+      modules: {
+        select: { id: true, level: true },
+      },
+    },
   });
 
   if (!course) {
@@ -720,9 +724,11 @@ export async function joinCourse(
     data: { studentId, courseId },
   });
 
-  if (course.modules.length > 0) {
+  const rootModules = course.modules.filter((m) => m.level === 0);
+
+  if (rootModules.length > 0) {
     await db.moduleProgress.createMany({
-      data: course.modules.map((m) => ({
+      data: rootModules.map((m) => ({
         studentId,
         courseId,
         moduleId: m.id,
