@@ -5,7 +5,7 @@ import { api } from "@/trpc/react";
 import Link from "next/link";
 
 export function StudentReviewButton({ courseIds }: { courseIds: string[] }) {
-  const { data: reviewsDue } = api.course.getReviewsDue.useQuery({
+  const { data: reviewsDue } = api.review.getReviewsDue.useQuery({
     courseIds,
   });
 

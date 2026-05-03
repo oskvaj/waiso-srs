@@ -204,3 +204,92 @@ async function unlockDependentModules(
     }
   }
 }
+
+export type StudentReviewsNeeded = {
+  totalForAllCoursesSent: number;
+};
+
+export async function reviewsDueNow(
+  db: PrismaClient,
+  courseIds: string[],
+  studentId: string,
+): Promise<StudentReviewsNeeded> {
+  const enrolledCount = await db.studentInCourse.count({
+    where: { studentId, courseId: { in: courseIds } },
+  });
+
+  if (enrolledCount !== courseIds.length) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not enrolled in all requested courses",
+    });
+  }
+
+  const courses = await Promise.all(
+    courseIds.map((courseId) =>
+      db.moduleProgress.findMany({
+        where: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+        select: {
+          nextReview: true,
+        },
+      }),
+    ),
+  );
+
+  return {
+    totalForAllCoursesSent: courses
+      .flat()
+      .filter((mp) => mp.nextReview === null).length,
+  };
+}
+
+export type StudentReviewschedule = {
+  moduleTimes: {
+    module: { name: string };
+    nextReview: Date | null;
+    moduleId: string;
+  }[];
+};
+
+export async function getStudentReviewSchedule(
+  db: PrismaClient,
+  courseId: string,
+  studentId: string,
+): Promise<StudentReviewschedule> {
+  try {
+    await db.studentInCourse.findUniqueOrThrow({
+      where: {
+        studentId_courseId: {
+          studentId: studentId,
+          courseId: courseId,
+        },
+      },
+    });
+  } catch (e) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Student not in course",
+    });
+  }
+
+  const moduleTimes = await db.moduleProgress.findMany({
+    where: { courseId, studentId },
+    orderBy: { nextReview: "asc" },
+    select: {
+      module: { select: { name: true } },
+      nextReview: true,
+      moduleId: true,
+    },
+  });
+
+  moduleTimes.sort((a, b) => {
+    if (!a.nextReview) return -1;
+    if (!b.nextReview) return 1;
+    return a.nextReview.getTime() - b.nextReview.getTime();
+  });
+
+  return { moduleTimes };
+}

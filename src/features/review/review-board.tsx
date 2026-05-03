@@ -66,7 +66,7 @@ export function ReviewBoard({ modules, returnHref }: Props) {
   const utils = api.useUtils();
   const updateResult = api.review.updateReviewResult.useMutation({
     onSuccess: () => {
-      void utils.course.getReviewsDue.invalidate();
+      void utils.review.getReviewsDue.invalidate();
     },
   });
 

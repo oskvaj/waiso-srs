@@ -10,7 +10,7 @@ export default async function ReviewSchedulePage({
   const { id } = await params;
 
   const [reviewsDue, course] = await Promise.all([
-    api.course.getReviewSchedule({ courseId: id }),
+    api.review.getReviewSchedule({ courseId: id }),
     api.course.getStudentOverview({ id: id }),
   ]);
 

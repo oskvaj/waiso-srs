@@ -9,8 +9,6 @@ import {
   publishCourse,
   listCoursesForStudent,
   getStudentCourseOverview,
-  reviewsDueNow,
-  getStudentReviewSchedule,
   numberOfCoursesWithoutTheoryRead,
   getUnlearntContent,
   getModuleGraph,
@@ -63,22 +61,6 @@ export const courseRouter = createTRPCRouter({
     .input(z.object({ id: z.string() }))
     .mutation(({ ctx, input }) => {
       return publishCourse(ctx.db, input.id, ctx.teacher.userId);
-    }),
-
-  getReviewsDue: studentProcedure
-    .input(z.object({ courseIds: z.array(z.string()) }))
-    .query(({ ctx, input }) => {
-      return reviewsDueNow(ctx.db, input.courseIds, ctx.student.userId);
-    }),
-
-  getReviewSchedule: studentProcedure
-    .input(z.object({ courseId: z.string() }))
-    .query(({ ctx, input }) => {
-      return getStudentReviewSchedule(
-        ctx.db,
-        input.courseId,
-        ctx.student.userId,
-      );
     }),
 
   getMissingTheoryNumber: studentProcedure
