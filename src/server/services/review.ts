@@ -1,4 +1,5 @@
 import type { PrismaClient, QuestionType } from "@/../generated/prisma";
+import { MAX_LEVEL, PASSED_LEVEL } from "@/lib/constants";
 import { TRPCError } from "@trpc/server";
 
 export type ReviewItem = {
@@ -83,7 +84,6 @@ function howManyHoursFromNow(level: number): number {
   }
   return 0;
 }
-
 export async function updateReviewResult(
   db: PrismaClient,
   studentId: string,
@@ -111,6 +111,12 @@ export async function updateReviewResult(
     });
   }
 
+  const newLevel = correct
+    ? firstTry
+      ? Math.min(MAX_LEVEL, progress.level + 1)
+      : Math.max(0, progress.level - 1)
+    : progress.level;
+
   await Promise.all([
     db.question.update({
       where: { id: questionId },
@@ -129,12 +135,72 @@ export async function updateReviewResult(
             },
           },
           data: {
-            nextReview: new Date(Date.now() + progress.level * 60 * 60 * 1000),
-            level: firstTry
-              ? Math.min(10, progress.level + 1)
-              : Math.max(0, progress.level - 1),
+            nextReview: new Date(Date.now() + newLevel * 60 * 60 * 1000),
+            level: newLevel,
           },
         })
       : Promise.resolve(),
   ]);
+
+  if (correct && newLevel >= PASSED_LEVEL && progress.level < PASSED_LEVEL) {
+    await unlockDependentModules(db, studentId, courseId, moduleId);
+  }
+}
+
+async function unlockDependentModules(
+  db: PrismaClient,
+  studentId: string,
+  courseId: string,
+  moduleId: string,
+) {
+  // Find modules that have this module as a prerequisite
+  const dependents = await db.module.findMany({
+    where: {
+      courseId,
+      prerequisites: { some: { id: moduleId } },
+    },
+    select: {
+      id: true,
+      prerequisites: { select: { id: true } },
+    },
+  });
+
+  for (const dependent of dependents) {
+    // Check if all prerequisites are at PASSED_LEVEL
+    const prereqProgresses = await db.moduleProgress.findMany({
+      where: {
+        studentId,
+        courseId,
+        moduleId: { in: dependent.prerequisites.map((p) => p.id) },
+      },
+      select: { level: true },
+    });
+
+    const allPassed =
+      prereqProgresses.length === dependent.prerequisites.length &&
+      prereqProgresses.every((p) => p.level >= PASSED_LEVEL);
+
+    if (allPassed) {
+      // Only create if not already unlocked
+      const existing = await db.moduleProgress.findUnique({
+        where: {
+          studentId_courseId_moduleId: {
+            studentId,
+            courseId,
+            moduleId: dependent.id,
+          },
+        },
+      });
+
+      if (!existing) {
+        await db.moduleProgress.create({
+          data: {
+            studentId,
+            courseId,
+            moduleId: dependent.id,
+          },
+        });
+      }
+    }
+  }
 }
