@@ -5,9 +5,10 @@ import { assertCourseOwnership } from "./course";
 import { TRPCError } from "@trpc/server";
 import {
   buildGraph,
+  computeModuleLevels,
   getAncestors,
   getDescendants,
-} from "../../lib/module-graph";
+} from "@/lib/module-graph";
 
 export type ModuleListItem = {
   id: string;
@@ -273,7 +274,6 @@ export async function addPrerequisite(
     where: { id: moduleId },
     include: { course: { select: { teacherId: true, id: true } } },
   });
-
   if (!mod) {
     throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
   }
@@ -290,7 +290,6 @@ export async function addPrerequisite(
   const modules = await getCourseModuleGraph(db, mod.course.id);
   const { requiredForMap } = buildGraph(modules);
   const descendants = getDescendants(moduleId, requiredForMap);
-
   if (descendants.has(prerequisiteId)) {
     throw new TRPCError({
       code: "BAD_REQUEST",
@@ -298,13 +297,17 @@ export async function addPrerequisite(
     });
   }
 
-  return db.module.update({
+  const result = await db.module.update({
     where: { id: moduleId },
     data: {
       prerequisites: { connect: { id: prerequisiteId } },
     },
     select: { id: true },
   });
+
+  await recomputeModuleLevels(db, mod.course.id);
+
+  return result;
 }
 
 export async function removePrerequisite(
@@ -315,9 +318,8 @@ export async function removePrerequisite(
 ): Promise<{ id: string }> {
   const mod = await db.module.findUnique({
     where: { id: moduleId },
-    include: { course: { select: { teacherId: true } } },
+    include: { course: { select: { teacherId: true, id: true } } },
   });
-
   if (!mod) {
     throw new TRPCError({ code: "NOT_FOUND", message: "Module not found" });
   }
@@ -325,13 +327,17 @@ export async function removePrerequisite(
     throw new TRPCError({ code: "FORBIDDEN", message: "Not your module" });
   }
 
-  return db.module.update({
+  const result = await db.module.update({
     where: { id: moduleId },
     data: {
       prerequisites: { disconnect: { id: prerequisiteId } },
     },
     select: { id: true },
   });
+
+  await recomputeModuleLevels(db, mod.course.id);
+
+  return result;
 }
 
 async function getCourseModuleGraph(db: PrismaClient, courseId: string) {
@@ -523,4 +529,18 @@ export async function setStudentHasRead(
       hasReadTheory: true,
     },
   });
+}
+
+async function recomputeModuleLevels(db: PrismaClient, courseId: string) {
+  const modules = await getCourseModuleGraph(db, courseId);
+  const levels = computeModuleLevels(modules);
+
+  await Promise.all(
+    modules.map((m) =>
+      db.module.update({
+        where: { id: m.id },
+        data: { level: levels.get(m.id) ?? 0 },
+      }),
+    ),
+  );
 }
