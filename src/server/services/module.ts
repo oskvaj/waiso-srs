@@ -24,14 +24,12 @@ export async function listModulesForTeacher(
   teacherId: string,
 ): Promise<ModuleListItem[]> {
   await assertCourseOwnership(db, courseId, teacherId);
-
   const enrolledCount = await db.studentInCourse.count({
     where: { courseId },
   });
-
   const modules = await db.module.findMany({
     where: { courseId },
-    orderBy: { createdAt: "asc" }, // TODO: order by something based on prerequisites in future
+    orderBy: [{ level: "asc" }, { name: "asc" }],
     select: {
       id: true,
       name: true,
@@ -41,13 +39,11 @@ export async function listModulesForTeacher(
       },
     },
   });
-
   return modules.map((m) => {
     const progress = calculateAvgModuleProgress(
       m.moduleProgresses,
       enrolledCount,
     );
-
     return {
       id: m.id,
       name: m.name,
@@ -86,13 +82,12 @@ export async function listModulesForStudent(
       message: "Student not in course",
     });
   }
-
   const modules = await db.module.findMany({
     where: { courseId },
-    orderBy: { createdAt: "asc" }, //TODO: change order by to internal level
     select: {
       id: true,
       name: true,
+      level: true,
       moduleProgresses: {
         where: { studentId: studentId },
         select: { level: true, nextReview: true, hasReadTheory: true },
@@ -100,16 +95,38 @@ export async function listModulesForStudent(
     },
   });
 
-  return modules.map((m) => {
-    return {
+  const sorted = modules
+    .map((m) => ({
       id: m.id,
       name: m.name,
       level: m.moduleProgresses[0]?.level ?? 0,
+      moduleLevel: m.level,
       nextReveiwTime: m.moduleProgresses[0]?.nextReview ?? null,
       isUnlocked: m.moduleProgresses.length > 0,
       hasReadTheory: m.moduleProgresses[0]?.hasReadTheory ?? false,
-    };
-  });
+    }))
+    .sort((a, b) => {
+      // Unlocked before locked
+      if (a.isUnlocked && !b.isUnlocked) return -1;
+      if (!a.isUnlocked && b.isUnlocked) return 1;
+
+      // Both locked, sort by module level
+      if (!a.isUnlocked && !b.isUnlocked) {
+        return a.moduleLevel - b.moduleLevel;
+      }
+
+      // Both unlocked, unread theory first
+      if (!a.hasReadTheory && b.hasReadTheory) return -1;
+      if (a.hasReadTheory && !b.hasReadTheory) return 1;
+
+      // Both unlocked, same read status — lowest progress level first
+      if (a.level !== b.level) return a.level - b.level;
+
+      // Same progress level, lower module level first
+      return a.moduleLevel - b.moduleLevel;
+    });
+
+  return sorted.map(({ moduleLevel, ...rest }) => rest);
 }
 
 export const createModuleSchema = z.object({
