@@ -13,6 +13,8 @@ export type QuestionListItem = {
   id: string;
   name: string;
   type: string;
+  correctAnswers: number;
+  totalAnswers: number;
 };
 
 export async function listQuestionsForModule(
@@ -40,6 +42,8 @@ export async function listQuestionsForModule(
       id: true,
       name: true,
       type: true,
+      correctAnswers: true,
+      totalAnswers: true,
     },
   });
 

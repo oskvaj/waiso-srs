@@ -31,6 +31,11 @@ export function QuestionCard({
     class: "bg-theme-subtle text-theme-muted",
   };
 
+  const percentage =
+    question.totalAnswers > 0
+      ? Math.round((question.correctAnswers / question.totalAnswers) * 100)
+      : null;
+
   return (
     <Link
       href={`/courses/${courseId}/modules/${moduleId}/questions/${question.id}`}
@@ -40,11 +45,26 @@ export function QuestionCard({
         className="hover:bg-theme-primary/5 p-3 transition-colors"
       >
         <p className="line-clamp-3 text-sm font-medium">{question.name}</p>
-        <span
-          className={`mt-2 inline-block w-fit rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo.class}`}
-        >
-          {typeInfo.label}
-        </span>
+        <div className="mt-2 flex items-center gap-2">
+          <span
+            className={`inline-block w-fit rounded-full px-2 py-0.5 text-xs font-medium ${typeInfo.class}`}
+          >
+            {typeInfo.label}
+          </span>
+          {percentage !== null && (
+            <span
+              className={`text-xs font-medium ${
+                percentage >= 70
+                  ? "text-theme-success"
+                  : percentage >= 40
+                    ? "text-theme-action"
+                    : "text-theme-danger"
+              }`}
+            >
+              {percentage}% correct
+            </span>
+          )}
+        </div>
       </Card>
     </Link>
   );
