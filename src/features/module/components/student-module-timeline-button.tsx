@@ -11,7 +11,7 @@ export function StudentReviewScheduleButton({ id }: { id: string }) {
           variant="raised"
           className="text-theme-text group hover:bg-theme-primary/15 h-full justify-center p-6 text-xl font-bold"
         >
-          <div>Upcomming Reviews</div>
+          <div>Upcoming Reviews</div>
         </Card>
       </Link>
     </div>
