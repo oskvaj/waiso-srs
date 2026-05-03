@@ -1,6 +1,6 @@
-import z from "zod";
+import { z } from "zod";
 import { createTRPCRouter, studentProcedure } from "../trpc";
-import { getReviewContent, updateReviews } from "@/server/services/review";
+import { getReviewContent, updateReviewResult } from "@/server/services/review";
 
 export const reviewRouter = createTRPCRouter({
   getReviewContent: studentProcedure
@@ -9,24 +9,25 @@ export const reviewRouter = createTRPCRouter({
       return getReviewContent(ctx.db, input.courseIds, ctx.student.userId);
     }),
 
-  updateReviewResults: studentProcedure
+  updateReviewResult: studentProcedure
     .input(
       z.object({
-        results: z.array(
-          z.object({
-            moduleId: z.string(),
-            firstTry: z.boolean(),
-            questions: z.array(
-              z.object({
-                questionId: z.string(),
-                correct: z.boolean(),
-              }),
-            ),
-          }),
-        ),
+        courseId: z.string(),
+        moduleId: z.string(),
+        questionId: z.string(),
+        correct: z.boolean(),
+        firstTry: z.boolean(),
       }),
     )
     .mutation(({ ctx, input }) => {
-      return updateReviews(ctx.db, input.results, ctx.student.userId);
+      return updateReviewResult(
+        ctx.db,
+        ctx.student.userId,
+        input.courseId,
+        input.moduleId,
+        input.questionId,
+        input.correct,
+        input.firstTry,
+      );
     }),
 });

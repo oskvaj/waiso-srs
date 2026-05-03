@@ -4,11 +4,12 @@ import { TRPCError } from "@trpc/server";
 export type ReviewItem = {
   moduleName: string;
   courseName: string;
+  courseId: string;
   moduleId: string;
   questions: {
     id: string;
     type: QuestionType;
-    content: unknown; //JSONContent, verified as questions on input
+    content: unknown;
   }[];
 };
 
@@ -20,18 +21,17 @@ export async function getReviewContent(
   const enrolledCount = await db.studentInCourse.count({
     where: { studentId, courseId: { in: courseIds } },
   });
-
   if (enrolledCount !== courseIds.length) {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not enrolled in all requested courses",
     });
   }
-
   const moduleIds = await db.moduleProgress.findMany({
     where: { studentId, courseId: { in: courseIds }, nextReview: null },
     select: {
       moduleId: true,
+      courseId: true,
       module: {
         select: {
           questions: { select: { id: true, type: true, content: true } },
@@ -43,10 +43,10 @@ export async function getReviewContent(
       },
     },
   });
-
   return moduleIds.map((m) => ({
     courseName: m.enrollment.course.name,
     moduleName: m.module.name,
+    courseId: m.courseId,
     moduleId: m.moduleId,
     questions: m.module.questions.map((q) => ({
       id: q.id,
@@ -84,60 +84,57 @@ function howManyHoursFromNow(level: number): number {
   return 0;
 }
 
-export async function updateReviews(
+export async function updateReviewResult(
   db: PrismaClient,
-  results: {
-    moduleId: string;
-    firstTry: boolean;
-    questions: {
-      questionId: string;
-      correct: boolean;
-    }[];
-  }[],
   studentId: string,
+  courseId: string,
+  moduleId: string,
+  questionId: string,
+  correct: boolean,
+  firstTry: boolean,
 ) {
-  const progresses = await db.moduleProgress.findMany({
+  const progress = await db.moduleProgress.findUnique({
     where: {
-      studentId: studentId,
-      moduleId: { in: results.map((r) => r.moduleId) },
+      studentId_courseId_moduleId: {
+        studentId,
+        courseId,
+        moduleId,
+      },
     },
-    select: { moduleId: true, courseId: true, level: true },
+    select: { level: true },
   });
 
-  const progressMap = new Map(progresses.map((p) => [p.moduleId, p]));
+  if (!progress) {
+    throw new TRPCError({
+      code: "NOT_FOUND",
+      message: "Module progress not found",
+    });
+  }
 
-  await Promise.all(
-    results.map((result) => {
-      const progress = progressMap.get(result.moduleId)!;
-      return db.moduleProgress.update({
-        where: {
-          studentId_courseId_moduleId: {
-            studentId: studentId,
-            moduleId: result.moduleId,
-            courseId: progress.courseId,
-          },
-        },
-        data: {
-          nextReview: new Date(Date.now() + progress.level * 60 * 60 * 1000),
-          level: result.firstTry
-            ? Math.min(10, progress.level + 1)
-            : Math.max(0, progress.level - 1),
-        },
-      });
+  await Promise.all([
+    db.question.update({
+      where: { id: questionId },
+      data: {
+        totalAnswers: { increment: 1 },
+        correctAnswers: correct ? { increment: 1 } : undefined,
+      },
     }),
-  );
-
-  results.map((result) =>
-    result.questions.map((question) =>
-      db.question.update({
-        where: {
-          id: question.questionId,
-        },
-        data: {
-          totalAnswers: { increment: 1 },
-          correctAnswers: question.correct ? { increment: 1 } : undefined,
-        },
-      }),
-    ),
-  );
+    correct
+      ? db.moduleProgress.update({
+          where: {
+            studentId_courseId_moduleId: {
+              studentId,
+              moduleId,
+              courseId,
+            },
+          },
+          data: {
+            nextReview: new Date(Date.now() + progress.level * 60 * 60 * 1000),
+            level: firstTry
+              ? Math.min(10, progress.level + 1)
+              : Math.max(0, progress.level - 1),
+          },
+        })
+      : Promise.resolve(),
+  ]);
 }
