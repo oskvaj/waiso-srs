@@ -1,5 +1,11 @@
 import type { PrismaClient, QuestionType } from "@/../generated/prisma";
-import { MAX_LEVEL, PASSED_LEVEL } from "@/lib/constants";
+import {
+  MAX_LEVEL,
+  PASSED_LEVEL,
+  SRS_INTERVALS_MS,
+  SRS_INTERVALS_TEST_MS,
+  USE_TEST_SRS,
+} from "@/lib/constants";
 import { TRPCError } from "@trpc/server";
 
 export type ReviewItem = {
@@ -135,7 +141,7 @@ export async function updateReviewResult(
             },
           },
           data: {
-            nextReview: new Date(Date.now() + newLevel * 60 * 60 * 1000),
+            nextReview: getNextReviewTime(newLevel),
             level: newLevel,
           },
         })
@@ -292,4 +298,10 @@ export async function getStudentReviewSchedule(
   });
 
   return { moduleTimes };
+}
+
+function getNextReviewTime(level: number): Date {
+  const intervals = USE_TEST_SRS ? SRS_INTERVALS_TEST_MS : SRS_INTERVALS_MS;
+  const clamped = Math.max(0, Math.min(level, MAX_LEVEL));
+  return new Date(Date.now() + intervals[clamped]!);
 }
