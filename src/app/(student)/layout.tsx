@@ -1,6 +1,7 @@
 import { auth } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/server/db";
+import { NotificationPrompt } from "@/components/notification-prompt";
 
 export default async function StudentLayout({
   children,
@@ -24,6 +25,7 @@ export default async function StudentLayout({
   return (
     <div className="bg-theme-page text-theme-text min-h-screen">
       <main className="mx-auto max-w-7xl px-3 pt-10 pb-30">{children}</main>
+      <NotificationPrompt />
     </div>
   );
 }
