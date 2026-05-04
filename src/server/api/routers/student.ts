@@ -28,4 +28,18 @@ export const studentRouter = createTRPCRouter({
       select: { name: true, email: true },
     });
   }),
+
+  createAccount: protectedProcedure
+    .input(z.object({ name: z.string().min(1).max(100) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.user.update({
+        where: { id: ctx.session.user.id },
+        data: { name: input.name },
+      });
+      await ctx.db.student.upsert({
+        where: { userId: ctx.session.user.id },
+        create: { userId: ctx.session.user.id },
+        update: {},
+      });
+    }),
 });

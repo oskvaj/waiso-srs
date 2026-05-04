@@ -1,46 +1,22 @@
-import Link from "next/link";
-
+import { LandingPage } from "@/components/landing";
 import { auth } from "@/server/auth";
-import { HydrateClient } from "@/trpc/server";
-import { env } from "@/env";
+import { db } from "@/server/db";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
+  console.log("HOME SESSION", session);
 
-  return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-linear-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <div className="text-4xl">
-            <Link href="/courses">Teacher Link</Link>
-          </div>
-          <div className="text-4xl">
-            <Link href="/course">Student Link</Link>
-          </div>
-          <div>{session ? "You are signed in" : "You are not signed in"}</div>
-          <div className="flex flex-col items-center gap-2">
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={
-                  session
-                    ? env.NODE_ENV === "development"
-                      ? "/api/dev-logout"
-                      : "/api/auth/signout"
-                    : env.NODE_ENV === "development"
-                      ? "/dev-login"
-                      : "/api/auth/signin"
-                }
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </main>
-    </HydrateClient>
-  );
+  if (session?.user) {
+    const [student, teacher] = await Promise.all([
+      db.student.findUnique({ where: { userId: session.user.id } }),
+      db.teacher.findUnique({ where: { userId: session.user.id } }),
+    ]);
+
+    if (teacher) redirect("/courses");
+    if (student) redirect("/course");
+    redirect("/onboarding");
+  }
+
+  return <LandingPage />;
 }

@@ -118,7 +118,6 @@ export function AccountDialog({
             </div>
 
             <div className="flex items-center justify-between">
-              <Label className="text-sm">Push notifications</Label>
               <NotificationToggle />
             </div>
           </div>

@@ -56,7 +56,7 @@ export function NotificationToggle() {
   };
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex w-full items-center justify-between gap-3">
       <Label htmlFor="push-notifications" className="text-sm">
         Push notifications
       </Label>
