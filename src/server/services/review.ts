@@ -68,33 +68,6 @@ export async function getReviewContent(
   }));
 }
 
-function howManyHoursFromNow(level: number): number {
-  switch (level) {
-    case 0:
-      return 2;
-    case 1:
-      return 4;
-    case 2:
-      return 12;
-    case 3:
-      return 24;
-    case 4:
-      return 48;
-    case 5:
-      return 168;
-    case 6:
-      return 336;
-    case 7:
-      return 731;
-    case 8:
-      return 2191;
-    case 9:
-      return 4383;
-    case 10:
-      return 17532;
-  }
-  return 0;
-}
 export async function updateReviewResult(
   db: PrismaClient,
   studentId: string,
@@ -281,7 +254,7 @@ export async function getStudentReviewSchedule(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",

@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 export default async function ModuleEditorPage({
   params,
 }: {
-  params: Promise<{ id: string; moduleId: string }>;
+  params: Promise<{ moduleId: string }>;
 }) {
-  const { id, moduleId } = await params;
+  const { moduleId } = await params;
 
   let mod, questions, prerequisites, requiredFor;
   try {

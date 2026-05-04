@@ -1,6 +1,6 @@
-import { PrismaClient } from "@/../generated/prisma";
+import type { PrismaClient } from "@/../generated/prisma";
 import { calculateAvgModuleProgress } from "./progress";
-import z, { promise } from "zod";
+import z from "zod";
 import { assertCourseOwnership } from "./course";
 import { TRPCError } from "@trpc/server";
 import {
@@ -76,7 +76,7 @@ export async function listModulesForStudent(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",
@@ -126,7 +126,7 @@ export async function listModulesForStudent(
       return a.moduleLevel - b.moduleLevel;
     });
 
-  return sorted.map(({ moduleLevel, ...rest }) => rest);
+  return sorted.map(({ moduleLevel: _moduleLevel, ...rest }) => rest);
 }
 
 export const createModuleSchema = z.object({
@@ -473,7 +473,7 @@ export async function getStudentModuleOverview(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",
@@ -527,7 +527,7 @@ export async function setStudentHasRead(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",

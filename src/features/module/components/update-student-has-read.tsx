@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@/trpc/react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export function MarkAsRead({
   courseId,
@@ -20,11 +20,17 @@ export function MarkAsRead({
     },
   });
 
+  const mutationRef = useRef(mutation);
+  mutationRef.current = mutation;
+
   useEffect(() => {
     if (!hasRead) {
-      mutation.mutate({ courseId, moduleId });
+      mutationRef.current.mutate({
+        courseId,
+        moduleId,
+      });
     }
-  }, []);
+  }, [courseId, moduleId, hasRead]);
 
   return null;
 }

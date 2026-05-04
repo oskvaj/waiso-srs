@@ -235,7 +235,7 @@ export async function getStudentCourseOverview(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",
@@ -439,7 +439,7 @@ export async function numberOfCoursesWithoutTheoryRead(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",
@@ -475,7 +475,7 @@ export async function getUnlearntContent(
         },
       },
     });
-  } catch (e) {
+  } catch {
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Student not in course",
@@ -507,7 +507,7 @@ export async function getUnlearntContent(
             content: true,
           },
         });
-      } catch (e) {
+      } catch {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: `Module ${m.moduleId} not found`,
