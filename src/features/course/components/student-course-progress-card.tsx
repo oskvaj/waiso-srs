@@ -42,7 +42,7 @@ export function StudentCourseProgressCard({
 
         <div className="flex w-full items-center gap-2">
           <span className="font-theme-heading text-theme-secondary w-25 shrink-0 text-left text-sm">
-            Passed levels
+            Course mastery
           </span>
           <div className="bg-theme-subtle h-3 flex-1 rounded-full">
             <div

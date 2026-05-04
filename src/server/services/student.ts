@@ -61,3 +61,14 @@ export async function listStudentsForCourse(
     };
   });
 }
+
+export async function updateUserName(
+  db: PrismaClient,
+  userId: string,
+  name: string,
+) {
+  await db.user.update({
+    where: { id: userId },
+    data: { name },
+  });
+}

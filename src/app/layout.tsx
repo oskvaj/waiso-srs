@@ -7,6 +7,7 @@ import { fonts, getThemeVars, type ThemeMode, type ThemeName } from "./theme";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -31,8 +32,10 @@ export default function RootLayout({
         className="font-theme-body bg-theme-page text-theme-text antialiased"
         style={themeVars}
       >
-        <TRPCReactProvider>{children}</TRPCReactProvider>
-        <Toaster />
+        <ThemeProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );

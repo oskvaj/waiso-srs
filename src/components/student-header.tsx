@@ -2,8 +2,8 @@
 
 import { CircleUserRound, MoveLeft } from "lucide-react";
 import Link from "next/link";
-import { NotificationToggle } from "./notification-toggle";
-import { TestPushButton } from "./test-push-button";
+import { AccountDialog } from "./account-dialog";
+import { api } from "@/trpc/react";
 
 export function StudentHeader({
   href,
@@ -14,6 +14,8 @@ export function StudentHeader({
   text: string;
   moveLeft?: boolean;
 }) {
+  const { data: profile } = api.student.getProfile.useQuery();
+
   return (
     <header className="border-theme-border">
       <div className="flex h-14 items-center justify-between">
@@ -26,13 +28,14 @@ export function StudentHeader({
             {text}
           </div>
         </Link>
-        <NotificationToggle />
-        <TestPushButton />
-        <div className="text-theme-muted flex items-center gap-4 text-sm">
-          <button type="button" className="hover:cursor-pointer">
-            <CircleUserRound className="text-theme-primary hover:text-theme-primary/70 size-8" />
-          </button>
-        </div>
+        {profile ? (
+          <AccountDialog
+            email={profile.email ?? ""}
+            initialName={profile.name ?? ""}
+          />
+        ) : (
+          <CircleUserRound className="text-theme-primary hover:text-theme-primary/70 size-8" />
+        )}
       </div>
     </header>
   );
