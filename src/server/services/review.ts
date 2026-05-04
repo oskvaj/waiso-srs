@@ -35,7 +35,12 @@ export async function getReviewContent(
     });
   }
   const moduleIds = await db.moduleProgress.findMany({
-    where: { studentId, courseId: { in: courseIds }, nextReview: null },
+    where: {
+      studentId,
+      courseId: { in: courseIds },
+      nextReview: null,
+      hasReadTheory: true,
+    },
     select: {
       moduleId: true,
       courseId: true,
@@ -240,6 +245,7 @@ export async function reviewsDueNow(
         },
         select: {
           nextReview: true,
+          hasReadTheory: true,
         },
       }),
     ),
@@ -248,7 +254,8 @@ export async function reviewsDueNow(
   return {
     totalForAllCoursesSent: courses
       .flat()
-      .filter((mp) => mp.nextReview === null).length,
+      .filter((mp) => mp.nextReview === null && mp.hasReadTheory === true)
+      .length,
   };
 }
 

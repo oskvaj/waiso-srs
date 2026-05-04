@@ -23,6 +23,7 @@ export default async function ReviewSchedulePage({
           <TheoryViewer
             contentList={unlearntContent.contentList}
             courseId={id}
+            courseName={unlearntContent.courseName}
           />
         </div>
       </div>

@@ -12,7 +12,13 @@ export function MarkAsRead({
   moduleId: string;
   hasRead: boolean;
 }) {
-  const mutation = api.module.studentSetHasRead.useMutation();
+  const utils = api.useUtils();
+
+  const mutation = api.module.studentSetHasRead.useMutation({
+    onSuccess: () => {
+      void utils.review.getReviewsDue.invalidate();
+    },
+  });
 
   useEffect(() => {
     if (!hasRead) {

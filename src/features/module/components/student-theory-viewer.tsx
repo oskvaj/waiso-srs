@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { api } from "@/trpc/react";
 import type { JSONContent } from "@tiptap/core";
 import { TipTapEditor } from "@/components/editor/tiptap-editor";
@@ -11,16 +11,29 @@ import Link from "next/link";
 export function TheoryViewer({
   contentList,
   courseId,
+  courseName,
 }: {
   contentList: { moduleId: string; content: unknown }[];
   courseId: string;
+  courseName: string;
 }) {
   const [index, setIndex] = useState(0);
-  const mutation = api.module.studentSetHasRead.useMutation();
+
+  const utils = api.useUtils();
+  const mutation = api.module.studentSetHasRead.useMutation({
+    onSuccess: () => {
+      void utils.review.getReviewsDue.invalidate();
+    },
+  });
+  const mutationRef = useRef(mutation);
+  mutationRef.current = mutation;
 
   useEffect(() => {
-    mutation.mutate({ courseId, moduleId: contentList[index]!.moduleId });
-  }, [index]);
+    mutationRef.current.mutate({
+      courseId,
+      moduleId: contentList[index]!.moduleId,
+    });
+  }, [index, courseId, contentList]);
 
   const handleNext = () => {
     if (index < contentList.length - 1) {
@@ -63,9 +76,14 @@ export function TheoryViewer({
             />
           </div>
           {index === contentList.length - 1 && (
-            <div className="text-theme-primary border-theme-primary/85 bg-theme-primary/15 hover:bg-theme-primary/25 mx-auto my-6 flex w-full max-w-100 justify-center rounded-lg border py-4">
-              <Link href={`/course/${courseId}`}>Back to Course</Link>
-            </div>
+            <Link href={`/course/${courseId}`}>
+              <Button
+                size="lg"
+                className="mx-auto flex w-full max-w-100 items-center justify-center py-6"
+              >
+                Back to {courseName}
+              </Button>
+            </Link>
           )}
         </div>
 

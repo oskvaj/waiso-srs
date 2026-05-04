@@ -15,9 +15,9 @@ export default async function ReviewPage({
     redirect("/course");
   }
 
-  const [modulesThatNeedReview] = await Promise.all([
-    api.review.getReviewContent({ courseIds }),
-  ]);
+  const modulesThatNeedReview = await api.review.getReviewContent({
+    courseIds,
+  });
 
   if (modulesThatNeedReview.length === 0) {
     redirect("/course");
