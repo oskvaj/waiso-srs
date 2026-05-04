@@ -16,6 +16,7 @@ import { CircleUserRound, SquarePen } from "lucide-react";
 import { NotificationToggle } from "./notification-toggle";
 import { useTheme } from "./theme-provider";
 import { api } from "@/trpc/react";
+import { signOut } from "next-auth/react";
 
 export function AccountDialog({
   email,
@@ -121,6 +122,14 @@ export function AccountDialog({
               <NotificationToggle />
             </div>
           </div>
+        </div>
+        <div className="border-theme-border border-t pt-4">
+          <Button
+            variant="destructive"
+            onClick={() => signOut({ callbackUrl: "/" })}
+          >
+            Log out
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

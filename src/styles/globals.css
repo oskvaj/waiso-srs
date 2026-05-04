@@ -106,3 +106,15 @@
   background-color: var(--app-border);
   border-radius: 3px;
 }
+
+.prose {
+  --tw-prose-body: var(--app-text);
+  --tw-prose-headings: var(--app-text);
+  --tw-prose-bold: var(--app-text);
+  --tw-prose-links: var(--app-primary);
+  --tw-prose-code: var(--app-text);
+  --tw-prose-quotes: var(--app-muted);
+  --tw-prose-counters: var(--app-muted);
+  --tw-prose-bullets: var(--app-muted);
+  --tw-prose-hr: var(--app-border);
+}

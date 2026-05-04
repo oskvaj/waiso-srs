@@ -125,7 +125,7 @@ export function MultipleChoiceCard({
         <Button
           onClick={handleSubmit}
           disabled={selected.size === 0}
-          className="w-full"
+          className="w-full py-6"
         >
           Submit answer
         </Button>
@@ -139,7 +139,7 @@ export function MultipleChoiceCard({
               <Viewer content={content.explanation} />
             </div>
           )}
-          <Button onClick={() => onAnswer(isCorrect)} className="w-full">
+          <Button onClick={() => onAnswer(isCorrect)} className="w-full py-6">
             Continue <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>
