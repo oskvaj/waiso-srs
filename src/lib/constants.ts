@@ -39,4 +39,4 @@ export const SRS_INTERVALS_TEST_MS = [
   300 * 1000, // Level 10: 300s
 ] as const;
 
-export const USE_TEST_SRS = true; // TODO: set to false for production
+export const USE_TEST_SRS = false; // TODO: set to false for production
