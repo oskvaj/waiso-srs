@@ -24,7 +24,7 @@ export default async function ReviewPage({
   }
 
   return (
-    <div className="-mx-3 -mt-10 -mb-30 h-screen overflow-hidden px-3 pt-10">
+    <div className="-mx-3 -mt-10 -mb-30 h-screen px-3 pt-10">
       <div className="flex h-full flex-col">
         <StudentHeader
           href={courseIds.length === 1 ? `/course/${courseIds[0]}` : "/course"}
@@ -35,7 +35,7 @@ export default async function ReviewPage({
           }
           moveLeft={courseIds.length === 1}
         />
-        <div className="min-h-0 flex-1">
+        <div className="flex-1 pb-20">
           <ReviewBoard
             modules={modulesThatNeedReview}
             returnHref={

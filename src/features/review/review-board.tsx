@@ -177,7 +177,7 @@ export function ReviewBoard({ modules, returnHref }: Props) {
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1 items-start justify-center pt-8">
+      <div className="flex flex-1 items-start justify-center pt-8">
         <div className="w-full max-w-lg space-y-4">
           <QuestionCard
             key={currentPick.question.id}
