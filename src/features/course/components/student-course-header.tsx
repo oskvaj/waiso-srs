@@ -7,6 +7,7 @@ import type {
 import { usePathname } from "next/navigation";
 import { StudentHeader } from "@/components/student-header";
 import { StudentCourseProgressCard } from "./student-course-progress-card";
+import { CourseNameDescription } from "./course-name-description";
 
 export function StudentCourseHeader({
   course,
@@ -25,8 +26,12 @@ export function StudentCourseHeader({
 
   return (
     <div>
-      <div>
+      <div className="py-1">
         <StudentHeader href={parent} text={"Courses"} moveLeft={true} />
+        <CourseNameDescription
+          name={course.name}
+          description={course.description}
+        />
       </div>
       <div>
         <StudentCourseProgressCard courseInfo={courseInfo} />
