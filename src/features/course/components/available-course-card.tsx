@@ -12,8 +12,10 @@ export function AvailableCourseCard({
   course: PublicCourseListItem;
 }) {
   const router = useRouter();
+
   const joinMutation = api.course.join.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      router.refresh();
       router.push("/course");
     },
   });
