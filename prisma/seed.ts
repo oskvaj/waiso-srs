@@ -2050,8 +2050,6 @@ const conversionQuestions: QuestionDef[] = [
   },
 ];
 
-// --- Main seed function ---
-
 async function main() {
   await clearDatabase();
 
