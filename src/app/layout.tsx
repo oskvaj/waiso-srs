@@ -1,6 +1,8 @@
 import "@/styles/globals.css";
 
 import { type Metadata } from "next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 
 import { TRPCReactProvider } from "@/trpc/react";
 import { fonts, getThemeVars, type ThemeMode, type ThemeName } from "./theme";
@@ -36,6 +38,8 @@ export default function RootLayout({
           <TRPCReactProvider>{children}</TRPCReactProvider>
           <Toaster />
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
