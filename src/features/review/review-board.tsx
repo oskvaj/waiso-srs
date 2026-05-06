@@ -12,6 +12,7 @@ import { api } from "@/trpc/react";
 import { MultipleChoiceCard } from "./multiple-choice-card";
 import { FreeTextCard } from "./free-text-card";
 import { PairCard } from "./pair-card";
+import { shuffle } from "@/lib/utils";
 
 type Props = {
   modules: ReviewItem[];
@@ -64,6 +65,11 @@ function QuestionCard({
 export function ReviewBoard({ modules, returnHref }: Props) {
   const router = useRouter();
   const utils = api.useUtils();
+
+  const [shuffledModules] = useState(() =>
+    modules.map((m) => ({ ...m, questions: shuffle(m.questions) })),
+  );
+
   const updateResult = api.review.updateReviewResult.useMutation({
     onSuccess: () => {
       void utils.review.getReviewsDue.invalidate();
@@ -83,8 +89,8 @@ export function ReviewBoard({ modules, returnHref }: Props) {
   } | null>(null);
 
   const remainingModules = useMemo(
-    () => modules.filter((m) => !completedModuleIds.has(m.moduleId)),
-    [modules, completedModuleIds],
+    () => shuffledModules.filter((m) => !completedModuleIds.has(m.moduleId)),
+    [shuffledModules, completedModuleIds],
   );
 
   const pickNext = useCallback(() => {
@@ -136,7 +142,7 @@ export function ReviewBoard({ modules, returnHref }: Props) {
         newCompleted.add(mod.moduleId);
         setCompletedModuleIds(newCompleted);
 
-        if (newCompleted.size === modules.length) {
+        if (newCompleted.size === shuffledModules.length) {
           router.push(returnHref);
           return;
         }
@@ -144,7 +150,7 @@ export function ReviewBoard({ modules, returnHref }: Props) {
 
       setCurrentPick(null);
     },
-    [currentPick, completedModuleIds, modules, returnHref, router],
+    [currentPick, completedModuleIds, shuffledModules, returnHref, router],
   );
 
   if (!currentPick) {

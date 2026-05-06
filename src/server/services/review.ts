@@ -6,6 +6,7 @@ import {
   SRS_INTERVALS_TEST_MS,
   USE_TEST_SRS,
 } from "@/lib/constants";
+import { shuffle } from "@/lib/utils";
 import { TRPCError } from "@trpc/server";
 
 export type ReviewItem = {
@@ -60,11 +61,13 @@ export async function getReviewContent(
     moduleName: m.module.name,
     courseId: m.courseId,
     moduleId: m.moduleId,
-    questions: m.module.questions.map((q) => ({
-      id: q.id,
-      type: q.type,
-      content: q.content,
-    })),
+    questions: shuffle(
+      m.module.questions.map((q) => ({
+        id: q.id,
+        type: q.type,
+        content: q.content,
+      })),
+    ),
   }));
 }
 
