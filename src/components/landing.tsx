@@ -84,8 +84,7 @@ export function LandingPage() {
         )}
 
         <p className="text-theme-disabled text-xs">
-          Built on spaced repetition research by Ebbinghaus, Leitner &amp;
-          Wozniak
+          Built on spaced repetition research by Ebbinghaus &amp; Wozniak
         </p>
       </div>
     </main>
