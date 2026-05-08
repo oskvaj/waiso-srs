@@ -33,9 +33,7 @@ export function ModulesSection({
         </h2>
         <div className="space-x-4">
           <Link href={`/courses/${courseId}/graph`}>
-            <Button variant="secondary" className="items-center">
-              Dependency graph
-            </Button>
+            <Button className="items-center">Dependency graph</Button>
           </Link>
           <AddModuleDialog courseId={courseId}>
             <Button

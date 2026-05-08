@@ -14,6 +14,8 @@ export function LandingPage() {
     e.preventDefault();
     if (!email.trim()) return;
 
+    setLoading(true);
+
     await signIn("nodemailer", {
       email: email.trim(),
       redirect: false,

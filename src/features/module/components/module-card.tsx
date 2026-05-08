@@ -26,7 +26,7 @@ export function ModuleCard({
         <CardContent>
           <div className="space-y-2">
             <ProgressBar value={module.avgProgress} color="bg-theme-primary" />
-            <ProgressBar value={module.avgMastery} color="bg-theme-action" />
+            <ProgressBar value={module.avgMastery} color="bg-theme-secondary" />
           </div>
         </CardContent>
       </Card>
