@@ -2069,7 +2069,7 @@ async function main() {
       name: "Basic Computer Technology",
       description:
         "Proof of Concept course by creators of the application covering the basics of computer technology",
-      published: false,
+      published: true,
       teacherId: teacher.id,
     },
   });
@@ -2080,6 +2080,7 @@ async function main() {
       name: "Positional Numeral Systems",
       courseId: course.id,
       content: positionalNumeralSystemsContent,
+      level: 0,
     },
   });
 
@@ -2088,6 +2089,7 @@ async function main() {
       name: "Boolean algebra",
       courseId: course.id,
       content: booleanAlgebraContent,
+      level: 0,
     },
   });
 
@@ -2096,6 +2098,7 @@ async function main() {
       name: "Function and Truth Tables",
       courseId: course.id,
       content: functionAndTruthTablesContent,
+      level: 1,
     },
   });
 
@@ -2104,6 +2107,7 @@ async function main() {
       name: "More gates",
       courseId: course.id,
       content: moreGatesContent,
+      level: 1,
     },
   });
 
@@ -2112,6 +2116,7 @@ async function main() {
       name: "Gray-encoding",
       courseId: course.id,
       content: grayEncodingContent,
+      level: 1,
     },
   });
 
@@ -2120,6 +2125,7 @@ async function main() {
       name: "Converting from disjuctive&conjunctive form to NAND/NAD & NOR/NOR",
       courseId: course.id,
       content: conversionContent,
+      level: 2,
     },
   });
 
