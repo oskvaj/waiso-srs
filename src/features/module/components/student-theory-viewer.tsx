@@ -64,7 +64,7 @@ export function TheoryViewer({
           <ChevronLeft className="size-5" />
         </Button>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-30">
           <div>
             <TipTapEditor
               key={index}
