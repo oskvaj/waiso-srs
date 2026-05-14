@@ -9,7 +9,8 @@ export const QUESTION_TYPE_VALUES = Object.values(QuestionType) as [
 ];
 
 const HOUR_MS = 60 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
+const DAY_MS = 24 * HOUR_MS;
+const WEEK_MS = 7 * DAY_MS;
 
 export const SRS_INTERVALS_MS = [
   HOUR_MS, // Level 0: 1 hour (floor for failing/falling back to level 0)
@@ -17,12 +18,12 @@ export const SRS_INTERVALS_MS = [
   8 * HOUR_MS, // Level 2: 8 hours
   DAY_MS, // Level 3: 1 day
   3 * DAY_MS, // Level 4: 3 days
-  7 * DAY_MS, // Level 5: 7 days
-  14 * DAY_MS, // Level 6: 14 days
-  30 * DAY_MS, // Level 7: 30 days
-  60 * DAY_MS, // Level 8: 60 days
-  120 * DAY_MS, // Level 9: 120 days
-  240 * DAY_MS, // Level 10: 240 days
+  WEEK_MS, // Level 5: 1 week
+  2 * WEEK_MS, // Level 6: 2 weeks
+  4 * WEEK_MS, // Level 7: 4 weeks
+  8 * WEEK_MS, // Level 8: 8 weeks
+  16 * WEEK_MS, // Level 9: 16 weeks
+  32 * WEEK_MS, // Level 10: 32 weeks
 ] as const;
 
 export const SRS_INTERVALS_TEST_MS = [
